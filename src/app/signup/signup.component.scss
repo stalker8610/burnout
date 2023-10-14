@@ -1,0 +1,16 @@
+:host {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* justify-content: center; */
+    max-width: 220px;
+    height: 100%;
+}
