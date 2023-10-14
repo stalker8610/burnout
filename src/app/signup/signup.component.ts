@@ -1,19 +1,24 @@
 import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, ValidationErrors, NgForm } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.scss']
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit {
+
+    @Input() token: string = '';
 
     hide = true;
+    signUpStatus = false;
+    signUpError = new Subject<string>();
+    loading = false;
 
     passwordGroup = new FormGroup({
-        /* email: new FormControl(''), */
         password: new FormControl('', { validators: [Validators.required, Validators.minLength(8)] }),
         passwordConfirm: new FormControl('')
     }, { validators: [checkPasswords] });
@@ -21,6 +26,20 @@ export class SignupComponent {
     errorMatcher = new MyErrorStateMatcher();
 
     constructor(private readonly authService: AuthService) { }
+
+    ngOnInit(): void {
+        this.loading = true;
+        this.passwordGroup.disable();
+        this.authService.validateToken(this.token).subscribe({
+            next: () => { 
+                this.loading = false;
+                this.passwordGroup.enable();
+            },
+            error: (error) => { 
+                this.signUpError.next(error.message);
+            }
+        })
+    }
 
     getPasswordErrorMessage(): string {
         if (this.passwordGroup.hasError('required', 'password')) {
@@ -45,9 +64,27 @@ export class SignupComponent {
     }
 
     signUp() {
-        this.authService.signUp(
-            this.passwordGroup.controls['email']!.value!,
-            this.passwordGroup.controls['password']!.value!);
+
+        this.loading = true;
+        this.signUpError.next('');
+        this.passwordGroup.disable();
+
+        this.authService.signUp(this.token,
+            this.passwordGroup.controls['password']!.value!).
+            subscribe({
+                next: () => this.signUpStatus = true,
+                error: (error) => {
+                    this.signUpError.next(error.message);
+                    this.passwordGroup.enable();
+                    this.loading = false;
+                }
+            });
+    }
+
+    changePasswordVisibility() {
+        if (!this.loading) {
+            this.hide = !this.hide;
+        }
     }
 
 }

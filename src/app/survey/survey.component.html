@@ -1,0 +1,9 @@
+<div>
+    <div *ngIf="surveyCompleted; else questionBlock" class="completed">
+        <img src="assets/images/survey-completed.png">
+        <div>Вот и все! Отличная работа!</div>
+    </div>
+    <ng-template #questionBlock>
+        <app-question-card [questions]="questions" (surveyCompleted)="onSurveyCompleted($event)"></app-question-card>
+    </ng-template>
+</div>

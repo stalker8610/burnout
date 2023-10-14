@@ -14,3 +14,26 @@
     max-width: 220px;
     height: 100%;
 }
+
+.disabled-icon {
+    color: gray;
+}
+
+.signup {
+    margin-top: 10px;
+    border-radius: 3px;
+    border-left-width: 3px;
+    border-left-style: solid;
+    display: block;
+    padding: 10px;
+}
+
+.success {
+    color: green;
+    border-left-color: green;
+}
+
+.error {
+    color: red;
+    border-left-color: red;
+}

@@ -1,12 +1,13 @@
 <form [formGroup]="passwordGroup" class="signup-form">
-    <mat-form-field>
+    <!-- <mat-form-field>
         <input matInput placeholder="Ваш е-мэйл" formControlName="email">
-    </mat-form-field>
+    </mat-form-field> -->
     <mat-form-field>
         <input matInput placeholder="Укажите пароль" formControlName="password" [type]="hide ? 'password' 
         : 'text'">
-        <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' :
-            'visibility_off'}}</mat-icon>
+        <mat-icon matSuffix (click)="changePasswordVisibility()" [class.disabled-icon]="loading">
+            {{hide ? 'visibility' :'visibility_off'}}
+        </mat-icon>
         <mat-error *ngIf="hasPasswordError()">
             {{getPasswordErrorMessage()}}
         </mat-error>
@@ -18,6 +19,12 @@
             {{getConfirmErrorMessage()}}
         </mat-error>
     </mat-form-field>
-    <button mat-stroked-button (click)="signUp()" type="button" [disabled]="hasPasswordError() || hasConfirmError()"
+    <button mat-stroked-button (click)="signUp()" type="button" [disabled]="loading || !passwordGroup.touched || hasPasswordError() || hasConfirmError()"
         color="primary">Зарегистрироваться</button>
+    <div *ngIf="signUpStatus" class="signup success">
+        Регистрация успешно завершена
+    </div>
+    <div *ngIf="(signUpError | async) as error" class="signup error">
+        {{error}}
+    </div>
 </form>

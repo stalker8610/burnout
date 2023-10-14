@@ -1,17 +1,20 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, provideRouter, withComponentInputBinding } from '@angular/router';
 
 import { LoginComponent } from '../login/login.component';
-import { UsersComponent } from '../users/users.component';
+import { HomeComponent } from '../home/home.component';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { SignupComponent } from '../signup/signup.component';
+import { QuestionCardComponent } from '../question-card/question-card.component';
+import { MoodQuestionCardComponent } from '../mood-question-card/mood-question-card.component';
+import { SurveyComponent } from '../survey/survey.component';
 
 
 const routes: Routes = [
-    { path: 'signup', component: SignupComponent, pathMatch: 'full' },
+    { path: 'signup/:token', component: SignupComponent, pathMatch: 'full' },
     { path: 'login', component: LoginComponent, pathMatch: 'full' },
-    { path: 'users', component: UsersComponent, pathMatch: 'full', /* canActivate: [authGuard] */ },
-    /* { path: '', redirectTo: 'home', pathMatch: 'full' }, */
+    { path: '', component: MoodQuestionCardComponent, pathMatch: 'full', /* canActivate: [authGuard] */ },
+    { path: 'survey', component: SurveyComponent, pathMatch: 'full', /* canActivate: [authGuard] */ },
     { path: '**', component: NotFoundComponent }
 ];
 
@@ -19,6 +22,7 @@ const routes: Routes = [
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
     exports: [RouterModule],
-    providers: []
+    providers: [
+        provideRouter(routes, withComponentInputBinding())]
 })
 export class AppRoutingModule { }

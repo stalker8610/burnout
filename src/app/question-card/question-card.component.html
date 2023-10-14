@@ -1,0 +1,16 @@
+<div class="header">
+    <div class="caption">
+        {{caption}}
+    </div>
+    <div class="index">
+        {{questionIndex+1}}/{{questions.length}}
+    </div>
+</div>
+<ng-template questionHost></ng-template>
+<div class="actions">
+    <mat-checkbox class="example-margin" [(ngModel)]="anonymous" color="primary">Опубликовать анонимно</mat-checkbox>
+    <div>
+        <button mat-stroked-button color="primary" (click)="skipAnswer()">Пропустить</button>
+        <button mat-stroked-button color="primary" (click)="confirmAnswer()">Далее</button>
+    </div>
+</div>

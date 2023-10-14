@@ -1,0 +1,27 @@
+<!-- <div class="header">
+    <div class="caption">
+        {{caption || 'Поделитесь с коллегами, чем вы занимались, как проводится работа?'}}
+    </div>
+    <div class="index">
+        {{questionIndex || 1}}/{{questionQueueLength || 1}}
+    </div>
+</div> -->
+<div class="emotions">
+    <img src="/assets/images/sad-mood.png" (click)="setMood(Mood.Sad)" [class.activated]="mood===Mood.Sad"
+        class="non-dragable">
+    <img src="/assets/images/neutral-mood.png" (click)="setMood(Mood.Neutral)" [class.activated]="mood===Mood.Neutral"
+        class="non-dragable">
+    <img src="/assets/images/happy-mood.png" (click)="setMood(Mood.Happy)" [class.activated]="mood===Mood.Happy"
+        class="non-dragable">
+</div>
+<div class="textarea">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <!-- <mat-label>Textarea</mat-label> -->
+        <textarea matInput [(ngModel)]="text" [style]="{resize: 'none'}" cdkTextareaAutosize cdkAutosizeMaxRows="6"
+            cdkAutosizeMinRows="6"></textarea>
+    </mat-form-field>
+</div>
+<!-- <div class="actions">
+    <mat-checkbox class="example-margin" [(ngModel)]="anonymous" color="primary">Опубликовать анонимно</mat-checkbox>
+    <button mat-stroked-button color="primary">Далее</button>
+</div> -->
