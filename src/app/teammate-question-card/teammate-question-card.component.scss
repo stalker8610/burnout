@@ -1,0 +1,56 @@
+/* :host {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+} */
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.teammate {}
+
+.teammate-name {}
+
+.teammate-department {
+    font-size: 12px;
+}
+
+.emotions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.emotion {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px 0 0;
+    flex: 1 1 0;
+    width: 0;
+
+    img {
+        cursor: pointer;
+        width: 75px;
+        height: 75px;
+    }
+
+    .label {
+        font-size: 11px;
+        line-height: 14px;
+        text-align: center;
+    }
+}
+
+.textarea {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 0;
+}

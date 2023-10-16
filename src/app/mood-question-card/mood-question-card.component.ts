@@ -1,5 +1,8 @@
 import { QuestionComponent } from './../question.interface';
-import { Component, Input } from '@angular/core';
+import { Component, Input, EventEmitter, OnInit } from '@angular/core';
+import { trigger, transition, animate, style, state } from '@angular/animations';
+import { SelectionModel } from '@angular/cdk/collections';
+import { BehaviorSubject } from 'rxjs';
 
 enum Mood {
     Sad,
@@ -10,34 +13,69 @@ enum Mood {
 @Component({
     selector: 'app-mood-question-card',
     templateUrl: './mood-question-card.component.html',
-    styleUrls: ['./mood-question-card.component.scss']
+    styleUrls: ['./mood-question-card.component.scss'],
+    animations: [
+        trigger('checked', [
+            state('checked', style({
+                opacity: 1
+            })),
+            state('unchecked', style({
+                opacity: 0.5
+            })),
+            transition('checked => unchecked', [
+                animate('0.15s')
+            ]),
+            transition('unchecked => checked', [
+                animate('0.15s')
+            ]),
+        ]),
+    ]
 })
-export class MoodQuestionCardComponent implements QuestionComponent {
+export class MoodQuestionCardComponent implements QuestionComponent, OnInit {
 
     @Input() inputData: any;
-
-    outputData: {
-        mood: Mood | null,
-        text: string
-    } | null = null;
-
-    public readonly Mood = Mood;
-    /* anonymous = false; */
-    mood: Mood | null = null;
+    emptyAnswer = new BehaviorSubject<boolean>(true);
     text: string = '';
 
+    moods = [
+        {
+            mood: Mood.Sad,
+            imgSrc: '/assets/images/wall/sad-mood.png'
+        },
+        {
+            mood: Mood.Neutral,
+            imgSrc: '/assets/images/wall/neutral-mood.png'
+        },
+        {
+            mood: Mood.Happy,
+            imgSrc: '/assets/images/wall/happy-mood.png'
+        },
+    ]
 
-    constructor() { }
+    selectionModel = new SelectionModel(false);
 
-    setMood(mood: Mood) {
-        this.mood = mood;
+    ngOnInit() {
+        this.selectionModel.changed.subscribe(() => {
+            this.updateEmptyAnswerState();
+        })
+    }
+
+    updateEmptyAnswerState() {
+        const emptyAnswer = !this.selectionModel.selected.length && !this.text.trim().length;
+        this.emptyAnswer.next(emptyAnswer);
+    }
+
+    getState(mood: Mood) {
+        return this.selectionModel.isSelected(mood) ? 'checked' : 'unchecked'
     }
 
     confirmAnswer() {
         return {
-            mood: this.mood,
+            mood: this.selectionModel.selected.length && this.selectionModel.selected[0] || null,
             text: this.text
         }
     }
+
+
 
 }

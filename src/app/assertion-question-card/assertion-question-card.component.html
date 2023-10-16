@@ -1,1 +1,12 @@
-<p>assertion-question-card works!</p>
+<div class="scores">
+    <ng-container *ngFor="let score of scores; index as i; trackBy: trackByFn">
+        <div *ngIf="i>0" class="edge" [@chosen]="scores[i] ? 'chosen' : 'regular'"></div>
+        <div class="circle" (click)="choice(i)" [@chosen]="scores[i] ? 'chosen' : 'regular'">
+            {{i+1}}
+        </div>
+    </ng-container>
+</div>
+<div class="legend">
+    <div>Абсолютно не согласен/не согласна</div>
+    <div>Совершенно согласен/согласна</div>
+</div>

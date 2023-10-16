@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 import { AppRoutingModule } from './routing/router.module';
@@ -26,6 +27,9 @@ import { MoodQuestionCardComponent } from './mood-question-card/mood-question-ca
 import { AssertionQuestionCardComponent } from './assertion-question-card/assertion-question-card.component';
 import { QuestionDirective } from './question.directive';
 import { SurveyComponent } from './survey/survey.component';
+import { TeamAssertQuestionCardComponent } from './team-assert-question-card/team-assert-question-card.component';
+import { TeammateQuestionCardComponent } from './teammate-question-card/teammate-question-card.component';
+import { TeamAssertBooleanQuestionCardComponent } from './team-assert-boolean-question-card/team-assert-boolean-question-card.component';
 
 
 
@@ -41,7 +45,10 @@ import { SurveyComponent } from './survey/survey.component';
         MoodQuestionCardComponent,
         AssertionQuestionCardComponent,
         QuestionDirective,
-        SurveyComponent
+        SurveyComponent,
+        TeamAssertQuestionCardComponent,
+        TeammateQuestionCardComponent,
+        TeamAssertBooleanQuestionCardComponent
     ],
     imports: [
         BrowserModule,
@@ -56,13 +63,14 @@ import { SurveyComponent } from './survey/survey.component';
         MatIconModule,
         MatListModule,
         TextFieldModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatProgressSpinnerModule
     ],
     providers: [
         {
             provide: MAT_RIPPLE_GLOBAL_OPTIONS,
             useValue: {
-                disabled: true
+                disabled: false
             }
         },
         {

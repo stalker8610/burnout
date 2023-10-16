@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { of, Observable } from 'rxjs';
+
 /* import { ICompany, IDepartment, IUser} from '../types/company.types'; */
 
 
@@ -58,13 +60,38 @@ const mockCompanyStructure: ICompanyStructure= {
     users: IUser[]
 } */
 
+export interface ITeammate {
+    name: string,
+    id: number,
+    department: string
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class DataService {
 
+    team: Array<ITeammate> = [
+        { name: 'Костин Вадим Андреевич-Владиславович', id: 1, department: 'Отдел внедрения превнедрения-вабвалвла' },
+        { name: 'Долгов Олег', id: 2 , department: 'Отдел внедрения'},
+        { name: 'Ковтун Артем', id: 3 , department: 'Отдел внедрения'},
+        { name: 'Фролов Максим', id: 4, department: 'Отдел внедрения' },
+        { name: 'Капустян Михаил', id: 5, department: 'Отдел внедрения' },
+        { name: 'Енгибарян Ваагн', id: 6, department: 'Отдел внедрения' },
+        { name: 'Фролов Максим', id: 4 , department: 'Отдел внедрения'},
+        { name: 'Капустян Михаил', id: 5 , department: 'Отдел внедрения'},
+        { name: 'Енгибарян Ваагн', id: 6 , department: 'Отдел внедрения'},
+        { name: 'Фролов Максим', id: 4 , department: 'Отдел внедрения'},
+        { name: 'Капустян Михаил', id: 5 , department: 'Отдел внедрения'},
+        { name: 'Енгибарян Ваагн', id: 6 , department: 'Отдел внедрения'}
+    ]
 
-    constructor(private httpClient: HttpClient){
+
+    constructor(private httpClient: HttpClient) {
+    }
+
+    getTeam(): Observable<ITeammate[]> {
+        return of(this.team);
     }
 
     /* getCompanyStructure(): ICompanyStructure {

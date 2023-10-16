@@ -3,6 +3,9 @@ import { QuestionDirective } from '../question.directive';
 import { QuestionComponent } from '../question.interface';
 import { QuestionItem } from '../survey.service';
 
+import { ITeammate } from '../data.service';
+import { distinctUntilChanged } from 'rxjs';
+
 @Component({
     selector: 'app-question-card',
     templateUrl: './question-card.component.html',
@@ -10,24 +13,27 @@ import { QuestionItem } from '../survey.service';
 })
 export class QuestionCardComponent {
 
+    @Input() team: ITeammate[] = []
     @Input() questions: QuestionItem[] = [];
     @Output() surveyCompleted = new EventEmitter();
 
-    questionIndex: number = -1;
-    caption = '';
+    questionIndex: number = 0;
+    title = '';
+    subtitle = '';
 
     private componentRef!: ComponentRef<QuestionComponent>;
 
     @ViewChild(QuestionDirective, { static: true }) questionHost!: QuestionDirective;
 
     anonymous = false;
+    emptyAnswer = true;
 
     ngOnInit(): void {
         this.loadQuestionComponent();
     }
 
     loadQuestionComponent() {
-        this.questionIndex++;
+
         const questionItem = this.questions[this.questionIndex];
 
         const viewContainerRef = this.questionHost.viewContainerRef;
@@ -35,9 +41,11 @@ export class QuestionCardComponent {
 
         this.componentRef = viewContainerRef.createComponent<QuestionComponent>(questionItem.component);
         this.componentRef.instance.inputData = questionItem.data;
-        if ('caption' in questionItem.data) {
-            this.caption = questionItem.data.caption;
-        }
+        this.componentRef.instance.emptyAnswer?.pipe(distinctUntilChanged()).
+            subscribe(value => this.emptyAnswer = value);
+
+        this.title = 'title' in questionItem.data ? questionItem.data.title : '';
+        this.subtitle = 'subtitle' in questionItem.data ? questionItem.data.subtitle : '';
     }
 
     confirmAnswer() {
@@ -45,8 +53,9 @@ export class QuestionCardComponent {
         this.nextQuestion();
     }
 
-    nextQuestion(){
+    nextQuestion() {
         if (this.questionIndex !== this.questions.length - 1) {
+            this.questionIndex++;
             this.loadQuestionComponent();
         } else {
             this.surveyCompleted.emit();
@@ -56,6 +65,17 @@ export class QuestionCardComponent {
     skipAnswer() {
         console.log('answer skipped');
         this.nextQuestion();
+    }
+
+    previousQuestion() {
+        if (this.questionIndex > 0) {
+            this.questionIndex--;
+            this.loadQuestionComponent();
+        }
+    }
+
+    stepBack() {
+        this.previousQuestion();
     }
 
 }
