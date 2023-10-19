@@ -15,21 +15,21 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AppRoutingModule } from './routing/router.module';
 
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './auth/login/login.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { SignupComponent } from './signup/signup.component';
+import { SignupComponent } from './auth/signup/signup.component';
 import { UsersComponent } from './users/users.component';
 import { HomeComponent } from './home/home.component';
-import { QuestionCardComponent } from './question-card/question-card.component';
-import { MoodQuestionCardComponent } from './mood-question-card/mood-question-card.component';
-import { AssertionQuestionCardComponent } from './assertion-question-card/assertion-question-card.component';
-import { QuestionDirective } from './question.directive';
+import { QuestionCardContainerComponent } from './cards/question-card-container/question-card-container.component';
+import { QuestionCardWallComponent } from './cards/question-card-wall/question-card-wall.component';
+import { QuestionCardCompanyComponent } from './cards/question-card-company/question-card-company.component';
+import { QuestionDirective } from './cards/question.directive';
 import { SurveyComponent } from './survey/survey.component';
-import { TeamAssertQuestionCardComponent } from './team-assert-question-card/team-assert-question-card.component';
-import { TeammateQuestionCardComponent } from './teammate-question-card/teammate-question-card.component';
-import { TeamAssertBooleanQuestionCardComponent } from './team-assert-boolean-question-card/team-assert-boolean-question-card.component';
+import { QuestionCardTeamAssertCheckboxComponent } from './cards/question-card-team-assert-checkbox/question-card-team-assert-checkbox.component';
+import { QuestionCardPersonalComponent } from './cards/question-card-personal/question-card-personal.component';
+import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-team-assert-boolean/question-card-team-assert-boolean.component';
 
 
 
@@ -41,14 +41,14 @@ import { TeamAssertBooleanQuestionCardComponent } from './team-assert-boolean-qu
         SignupComponent,
         UsersComponent,
         HomeComponent,
-        QuestionCardComponent,
-        MoodQuestionCardComponent,
-        AssertionQuestionCardComponent,
+        QuestionCardContainerComponent,
+        QuestionCardWallComponent,
+        QuestionCardCompanyComponent,
         QuestionDirective,
         SurveyComponent,
-        TeamAssertQuestionCardComponent,
-        TeammateQuestionCardComponent,
-        TeamAssertBooleanQuestionCardComponent
+        QuestionCardTeamAssertCheckboxComponent,
+        QuestionCardPersonalComponent,
+        QuestionCardTeamAssertBooleanComponent
     ],
     imports: [
         BrowserModule,
