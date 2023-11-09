@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
+import { login } from 'src/app/store/auth/auth.actions';
+import { getLoginError } from 'src/app/store/auth/auth.selectors';
 
 @Component({
     selector: 'app-login',
@@ -10,13 +11,15 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
 
-    public email = new FormControl('', { validators: [Validators.required, Validators.email] });
-    public password = new FormControl('', { validators: [Validators.required]});
+    email = new FormControl('', { validators: [Validators.required, Validators.email] });
+    password = new FormControl('', { validators: [Validators.required] });
 
-    constructor(private readonly authService: AuthService) { }
+    error$ = this.store.select(getLoginError);
+
+    constructor(private store: Store) { }
 
     auth() {
-        /* this.authService.login(this.email.value!, this.password.value!); */
+        this.store.dispatch(login({ email: this.email.value as string, password: this.password.value as string }));
     }
 
 }

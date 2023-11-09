@@ -1,6 +1,8 @@
 
 import { TObjectId, TWithId } from "./common.model.js"
 import { IRespondent } from "./respondent.model.js";
+import { IDepartment } from "./department.model.js";
+import { ICompany } from "./company.model.js";
 
 export type TQuestionType = 'wall' | 'company' | 'personal' | 'boolean' | 'checkbox'
 

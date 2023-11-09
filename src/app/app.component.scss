@@ -1,4 +1,15 @@
-:host{
-    display: block;
+:host {
+    display: grid;
+    grid-template-rows: 50px 1fr; 
+    height: 100%;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.content {
     height: 100%;
 }

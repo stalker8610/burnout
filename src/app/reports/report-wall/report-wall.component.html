@@ -1,0 +1,13 @@
+<div class="container">
+    <div *ngFor="let item of records">
+        <div class="record">
+            <div class="text">
+                {{item.text}}
+            </div>
+            <img *ngIf="item.mood !== undefined" [src]="images[item.mood]" class="mood">
+        </div>
+        <div class="date">
+            {{getDateView(item.date)}}
+        </div>
+    </div>
+</div>

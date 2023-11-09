@@ -1,23 +1,28 @@
-import { TObjectId, TWithId, TWithData } from '../../models/common.model';
+
+import { TObjectId, TWithId, TWithData } from '@models/common.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IDepartment } from '@models/department.model';
 import { IRespondent } from '@models/respondent.model';
-
-import { of, Observable } from 'rxjs';
+import { ICompany } from '@models/company.model';
 
 export type TTeammate = TWithData<TWithId<IRespondent>, IDepartment, 'department'> & {
     fullName: string
 };
 export type TTeam = TTeammate[];
 
+export type TCompanyStructure = {
+    companyId: TObjectId<ICompany>,
+    departments: TWithId<IDepartment>[],
+    team: TWithId<IRespondent>[]
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class DataService {
 
-    team: TTeam = [
+/*     team: TTeam = [
         {
             _id: '1',
             firstName: 'Вадим',
@@ -91,19 +96,27 @@ export class DataService {
             companyId: 'mockCompany'
         },
         companyId: 'mockCompany'
-    }
+    } */
 
     constructor(private httpClient: HttpClient) { }
 
-    getRespondent(respondentId: TObjectId<IRespondent>): TTeammate {
-        return this.teammate;
+    addRespondent(companyId: TObjectId<ICompany>, data: IRespondent) {
+        return this.httpClient.post<TWithId<IRespondent>>(`/api/respondents/${companyId}`, data)
     }
 
-    getTeam(): TTeam {
-        return this.team;
+    patchRespondent(companyId: TObjectId<ICompany>, data: TWithId<Partial<IRespondent>>) {
+        return this.httpClient.put<TWithId<IRespondent>>(`/api/respondents/${companyId}/${data._id}`, data)
     }
 
-    loadTeam(): Observable<TWithId<IRespondent>[]> {
-        return of(this.team);
+    addDepartment(companyId: TObjectId<ICompany>, data: IDepartment) {
+        return this.httpClient.post<TWithId<IDepartment>>(`/api/departments/${companyId}`, data)
+    }
+
+    patchDepartment(companyId: TObjectId<ICompany>, data: TWithId<Partial<IDepartment>>) {
+        return this.httpClient.put<TWithId<IDepartment>>(`/api/departments/${companyId}/${data._id}`, data)
+    }
+
+    loadData(companyId: TObjectId<ICompany>) {
+        return this.httpClient.get<TCompanyStructure>(`/api/companies/${companyId}/structure`);
     }
 }

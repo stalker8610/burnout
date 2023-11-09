@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { MAT_RIPPLE_GLOBAL_OPTIONS } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -10,6 +10,8 @@ import { MatListModule } from '@angular/material/list';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTreeModule } from '@angular/material/tree';
 
 
 import { AppRoutingModule } from './routing/router.module';
@@ -20,7 +22,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { SignupComponent } from './auth/signup/signup.component';
-import { UsersComponent } from './users/users.component';
 import { HomeComponent } from './home/home.component';
 import { QuestionCardContainerComponent } from './cards/question-card-container/question-card-container.component';
 import { QuestionCardWallComponent } from './cards/question-card-wall/question-card-wall.component';
@@ -30,8 +31,22 @@ import { SurveyComponent } from './survey/survey.component';
 import { QuestionCardTeamAssertCheckboxComponent } from './cards/question-card-team-assert-checkbox/question-card-team-assert-checkbox.component';
 import { QuestionCardPersonalComponent } from './cards/question-card-personal/question-card-personal.component';
 import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-team-assert-boolean/question-card-team-assert-boolean.component';
+import { ReportWallComponent } from './reports/report-wall/report-wall.component';
+import { CompanyComponent } from './company/company.component';
+import { CompanyTreeComponent } from './company/company-tree/company-tree.component';
+import { LogoutComponent } from './auth/logout/logout.component';
+import { LoginStatusComponent } from './auth/login-status/login-status.component';
+
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+import { authReducer } from './store/auth/auth.reducer';
+import { dataReducer } from './store/data/data.reducer';
 
 
+import * as authEffects from './store/auth/auth.effects';
+import * as dataEffects from './store/data/data.effects';
 
 @NgModule({
     declarations: [
@@ -39,7 +54,6 @@ import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-te
         LoginComponent,
         NotFoundComponent,
         SignupComponent,
-        UsersComponent,
         HomeComponent,
         QuestionCardContainerComponent,
         QuestionCardWallComponent,
@@ -48,7 +62,12 @@ import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-te
         SurveyComponent,
         QuestionCardTeamAssertCheckboxComponent,
         QuestionCardPersonalComponent,
-        QuestionCardTeamAssertBooleanComponent
+        QuestionCardTeamAssertBooleanComponent,
+        ReportWallComponent,
+        CompanyComponent,
+        CompanyTreeComponent,
+        LogoutComponent,
+        LoginStatusComponent
     ],
     imports: [
         BrowserModule,
@@ -64,7 +83,12 @@ import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-te
         MatListModule,
         TextFieldModule,
         MatCheckboxModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        MatAutocompleteModule,
+        MatTreeModule,
+        StoreModule.forRoot({ auth: authReducer, data: dataReducer }, {}),
+        EffectsModule.forRoot(authEffects, dataEffects),
+        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
     ],
     providers: [
         {
@@ -83,3 +107,4 @@ import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-te
     bootstrap: [AppComponent]
 })
 export class AppModule { }
+

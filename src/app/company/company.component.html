@@ -1,0 +1,25 @@
+<form class="add-user-form">
+    <mat-form-field appearance="outline">
+        <input matInput [formControl]="userName">
+        <mat-label>Имя сотрудника</mat-label>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <input matInput [formControl]="email">
+        <mat-label>E-mail</mat-label>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <input matInput [formControl]="department" [matAutocomplete]="auto">
+        <mat-label>Отдел</mat-label>
+        <mat-hint *ngIf="newDepartmentWillBeCreated()">* будет создан новый отдел</mat-hint>
+    </mat-form-field>
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+        <mat-option *ngFor="let department of filteredDepartments | async" [value]="department">
+            {{department.title}}
+        </mat-option>
+    </mat-autocomplete>
+
+    <button mat-stroked-button (click)="addRespondent()" type="button" [disabled]="email.invalid || userName.invalid"
+        color="primary">Добавить</button>
+</form>
+
+<app-company-tree></app-company-tree>

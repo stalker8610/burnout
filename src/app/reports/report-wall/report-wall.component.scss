@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+}
+
+.record {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+}
+
+.mood {
+    width: 50px;
+    height: 50px;
+    padding: 5px;
+}
+
+.text {
+    padding: 10px;
+    font-size: 18px;
+}
+
+.date {
+    margin: 2px 0 15px 10px;
+    opacity: 0.75;
+}

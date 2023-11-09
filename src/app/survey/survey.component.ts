@@ -86,20 +86,20 @@ export class SurveyComponent implements OnInit {
                 {
                     questionId: question._id,
                     title: question.title,
-                    teammate: this.dataService.getRespondent(this.survey.feedbackToId)
+                    //teammate: this.dataService.getRespondent(this.survey.feedbackToId)
                 });
             case 'boolean': return new QuestionItem(QuestionCardTeamAssertBooleanComponent,
                 {
                     questionId: question._id,
                     title: question.title,
-                    team: this.dataService.getTeam()
+                    //team: this.dataService.getTeam()
                 });
             case 'checkbox': return new QuestionItem(QuestionCardTeamAssertCheckboxComponent,
                 {
                     questionId: question._id,
                     title: question.title,
                     subtitle: 'Выберите, кто из коллег, как правило...',
-                    team: this.dataService.getTeam()
+                    //team: this.dataService.getTeam()
                 });
             case 'company': return new QuestionItem(QuestionCardCompanyComponent,
                 {

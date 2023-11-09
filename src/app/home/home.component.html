@@ -1,14 +1,18 @@
+<mat-nav-list class="menu">
+    <mat-list-item routerLink="wall" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+        Лента
+    </mat-list-item>
+    <mat-list-item routerLink="my" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+        Мой отчет
+    </mat-list-item>
+    <mat-list-item routerLink="company" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+        Отчет по компании
+    </mat-list-item>
+    <mat-list-item routerLink="structure" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+        Структура компании
+    </mat-list-item>
+</mat-nav-list>
 
 <div class="content">
-    <mat-nav-list>
-        <mat-list-item routerLink="settings" routerLinkActive="active-link" ariaCurrentWhenActive="page">
-            Настройки
-        </mat-list-item>
-        <mat-list-item routerLink="licensing" routerLinkActive="active-link" ariaCurrentWhenActive="page">
-            Лицензирование
-        </mat-list-item>
-    </mat-nav-list>
-    <!-- <div>
-        <router-outlet></router-outlet>
-    </div> -->
+    <router-outlet></router-outlet>
 </div>
