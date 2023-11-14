@@ -10,12 +10,12 @@ import { ReportWallComponent } from '../reports/report-wall/report-wall.componen
 import { CompanyComponent } from '../company/company.component';
 import { LogoutComponent } from '../auth/logout/logout.component';
 
-import { isAuthorizedGuard, isNotAuthorizedGuard } from './guards.service';
+import { isAuthorizedGuard, isHRUserGuard, isNotAuthorizedGuard } from './guards.service';
 
 
 const routes: Routes = [
     { path: 'signup/:token', canActivate: [isNotAuthorizedGuard], component: SignupComponent, pathMatch: 'full' },
-    { path: 'login', component: LoginComponent, pathMatch: 'full' },
+    { path: 'login', canActivate: [isNotAuthorizedGuard], component: LoginComponent, pathMatch: 'full' },
     { path: 'logout', canActivate: [isAuthorizedGuard], component: LogoutComponent, pathMatch: 'full' },
     { path: 'survey/:surveyId', canActivate: [isAuthorizedGuard], component: SurveyComponent, pathMatch: 'full' },
     {
@@ -44,6 +44,7 @@ const routes: Routes = [
             {
                 path: 'structure',
                 component: CompanyComponent,
+                canActivate: [isHRUserGuard],
                 pathMatch: 'full'
             },
         ]
@@ -54,7 +55,7 @@ const routes: Routes = [
 
 // configures NgModule imports and exports
 @NgModule({
-    imports: [RouterModule.forRoot(routes, { enableTracing: true }) ],
+    imports: [RouterModule.forRoot(routes, /* { enableTracing: true } */)],
     exports: [RouterModule],
     providers: [
         provideRouter(routes, withComponentInputBinding())]

@@ -12,7 +12,7 @@ export type TTeammate = TWithData<TWithId<IRespondent>, IDepartment, 'department
 export type TTeam = TTeammate[];
 
 export type TCompanyStructure = {
-    companyId: TObjectId<ICompany>,
+    _id: TObjectId<ICompany>,
     departments: TWithId<IDepartment>[],
     team: TWithId<IRespondent>[]
 }
@@ -22,8 +22,70 @@ export type TCompanyStructure = {
 })
 export class DataService {
 
-/*     team: TTeam = [
-        {
+    /*     team: TTeam = [
+            {
+                _id: '1',
+                firstName: 'Вадим',
+                lastName: 'Костин',
+                fullName: 'Костин Вадим',
+                email: 'kva@alexrovich.ru',
+                department: {
+                    title: 'Отдел внедрения',
+                    companyId: 'mockCompany'
+                },
+                companyId: 'mockCompany'
+            },
+            {
+                _id: '2',
+                firstName: 'Олег',
+                lastName: 'Долгов',
+                fullName: 'Долгов Олег',
+                email: 'oid@alexrovich.ru',
+                department: {
+                    title: 'Технический отдел',
+                    companyId: 'mockCompany'
+                },
+                companyId: 'mockCompany'
+            },
+            {
+                _id: '3',
+                firstName: 'Артем',
+                lastName: 'Ковтун',
+                fullName: 'Ковтун Артем',
+                email: 'kan@alexrovich.ru',
+                department: {
+                    title: 'Технический отдел',
+                    companyId: 'mockCompany'
+                },
+                companyId: 'mockCompany'
+            },
+            {
+                _id: '4',
+                firstName: 'Максим',
+                lastName: 'Фролов',
+                fullName: 'Фролов Максим',
+                email: 'mif@alexrovich.ru',
+                department: {
+                    title: 'Технический отдел',
+                    companyId: 'mockCompany'
+                },
+                companyId: 'mockCompany'
+            },
+            {
+                _id: '5',
+                firstName: 'Вадим',
+                lastName: 'Колымагин',
+                fullName: 'Колымагин Вадим',
+                email: 'vak@alexrovich.ru',
+                department: {
+                    title: 'Отдел внедрения',
+                    companyId: 'mockCompany'
+                },
+                companyId: 'mockCompany'
+            }
+        ]
+    
+        teammate: TTeammate = {
             _id: '1',
             firstName: 'Вадим',
             lastName: 'Костин',
@@ -34,69 +96,7 @@ export class DataService {
                 companyId: 'mockCompany'
             },
             companyId: 'mockCompany'
-        },
-        {
-            _id: '2',
-            firstName: 'Олег',
-            lastName: 'Долгов',
-            fullName: 'Долгов Олег',
-            email: 'oid@alexrovich.ru',
-            department: {
-                title: 'Технический отдел',
-                companyId: 'mockCompany'
-            },
-            companyId: 'mockCompany'
-        },
-        {
-            _id: '3',
-            firstName: 'Артем',
-            lastName: 'Ковтун',
-            fullName: 'Ковтун Артем',
-            email: 'kan@alexrovich.ru',
-            department: {
-                title: 'Технический отдел',
-                companyId: 'mockCompany'
-            },
-            companyId: 'mockCompany'
-        },
-        {
-            _id: '4',
-            firstName: 'Максим',
-            lastName: 'Фролов',
-            fullName: 'Фролов Максим',
-            email: 'mif@alexrovich.ru',
-            department: {
-                title: 'Технический отдел',
-                companyId: 'mockCompany'
-            },
-            companyId: 'mockCompany'
-        },
-        {
-            _id: '5',
-            firstName: 'Вадим',
-            lastName: 'Колымагин',
-            fullName: 'Колымагин Вадим',
-            email: 'vak@alexrovich.ru',
-            department: {
-                title: 'Отдел внедрения',
-                companyId: 'mockCompany'
-            },
-            companyId: 'mockCompany'
-        }
-    ]
-
-    teammate: TTeammate = {
-        _id: '1',
-        firstName: 'Вадим',
-        lastName: 'Костин',
-        fullName: 'Костин Вадим',
-        email: 'kva@alexrovich.ru',
-        department: {
-            title: 'Отдел внедрения',
-            companyId: 'mockCompany'
-        },
-        companyId: 'mockCompany'
-    } */
+        } */
 
     constructor(private httpClient: HttpClient) { }
 
@@ -108,12 +108,20 @@ export class DataService {
         return this.httpClient.put<TWithId<IRespondent>>(`/api/respondents/${companyId}/${data._id}`, data)
     }
 
+    removeRespondent(companyId: TObjectId<ICompany>, respondentId: TObjectId<IRespondent>) {
+        return this.httpClient.delete<Pick<TWithId<IRespondent>, '_id'>>(`/api/respondents/${companyId}/${respondentId}`)
+    }
+
     addDepartment(companyId: TObjectId<ICompany>, data: IDepartment) {
         return this.httpClient.post<TWithId<IDepartment>>(`/api/departments/${companyId}`, data)
     }
 
     patchDepartment(companyId: TObjectId<ICompany>, data: TWithId<Partial<IDepartment>>) {
         return this.httpClient.put<TWithId<IDepartment>>(`/api/departments/${companyId}/${data._id}`, data)
+    }
+
+    removeDepartment(companyId: TObjectId<ICompany>, departmentId: TObjectId<IRespondent>) {
+        return this.httpClient.delete<Pick<TWithId<IDepartment>, '_id'>>(`/api/departments/${companyId}/${departmentId}`)
     }
 
     loadData(companyId: TObjectId<ICompany>) {

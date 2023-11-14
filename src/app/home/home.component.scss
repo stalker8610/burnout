@@ -9,3 +9,11 @@
     padding: 20px;
     background-color: #E8EAF6;
 }
+
+mat-nav-list {
+    padding: 0;
+}
+
+mat-list-item:not(:focus).active-link {
+    background-color: rgb(0, 0, 0, 0.12);
+}

@@ -23,14 +23,6 @@ export class AuthService {
 
     constructor(private httpClient: HttpClient) { }
 
-    /* public isAuthenticated(): Boolean {
-        let userData = localStorage.getItem('userInfo')
-        if (userData && JSON.parse(userData)) {
-            return true;
-        }
-        return false;
-    } */
-
     public getMe() {
         return this.httpClient.get<TLoginResult | null>('/api/auth/me')
     }
@@ -44,10 +36,6 @@ export class AuthService {
         return this.httpClient.post('/api/auth/logout', {}, { responseType: 'text' });
     }
 
-    /* public setUserInfo(user) {
-        localStorage.setItem('userInfo', JSON.stringify(user));
-    } */
-
     public signUp(token: string, password: string) {
         return this.httpClient.post<TSignupResult>('/api/auth/signup', { token, password })
 
@@ -57,7 +45,6 @@ export class AuthService {
         return this.httpClient.get(`/api/tokens/validate/${token}`, { responseType: 'text' })
 
     }
-
 
 }
 

@@ -6,7 +6,7 @@ import { TLoginResult } from 'src/app/services/auth.service';
 import { TObjectId, TWithId } from '@models/common.model';
 import { IDepartment } from '@models/department.model';
 
-const featureKey = 'data';
+const featureKey = 'company';
 interface FeatureState extends IState { }
 
 // selectFeature will have the type MemoizedSelector<object, FeatureState>
@@ -48,7 +48,25 @@ export const getTeamExceptAuthorizedUser = createSelector(
             }))
 )
 
+export const getDepartmentsAndTeam = createSelector(
+    getDepartments,
+    getTeam,
+    (departments, team) => ({ departments, team })
+)
+
+
 export const getCompanyId = createSelector(
     selectFeature,
-    (state: IState) => state.data?.companyId
+    (state: IState) => state.data?._id
+)
+
+export const getLoaded = createSelector(
+    selectFeature,
+    (state: IState) => state.loaded
+)
+
+export const getAuthorizedUserData = createSelector(
+    getAuthorizedUser,
+    getTeam,
+    (user, team) => team?.find(teammate => teammate._id === user?.respondentId)
 )

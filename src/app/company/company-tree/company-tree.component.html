@@ -1,21 +1,54 @@
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+<mat-tree [dataSource]="dataSource" [trackBy]="trackByFn" [treeControl]="treeControl">
     <!-- This is the tree node template for leaf nodes -->
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
         <!-- use a disabled button to provide padding for tree leaf -->
-        <button mat-icon-button disabled></button>
-        <div [class.department]="node.type === 'department'" [class.respondent]="node.type==='respondent'">
-            {{node.title}}
+        <button *ngIf="!node.expandable; else expandable" mat-icon-button disabled></button>
+        <ng-template #expandable>
+            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
+                <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+            </button>
+        </ng-template>
+
+        <div [class]="getNodeClass(node)">
+            <div *ngIf="editNode?._id === node._id; else viewMode">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <!-- <input matInput type="text" [formControl]="editNodeControl" (blur)="confirmEdit()" (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()"> -->
+                    <input matInput appFocusable type="text" [formControl]="editNodeControl" (blur)="confirmEdit()" (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()">
+                </mat-form-field>
+            </div>
+            <ng-template #viewMode>{{nodeTitle(node)}}
+                <div class="command-bar" [class.invisible]="editNode?._id">
+                    <button mat-icon-button (click)="edit(node)" color="accent">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="remove(node)" color="accent" [disabled]="node.expandable">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+            </ng-template>
         </div>
+
     </mat-tree-node>
     <!-- This is the tree node template for expandable nodes -->
-    <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+    <!-- <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
         <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
             <mat-icon class="mat-icon-rtl-mirror">
                 {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
         </button>
-        <div [class.department]="node.type === 'department'" [class.respondent]=" node.type==='respondent'">
-            {{node.title}}
+        <div [class]="getNodeClass(node)">
+            {{nodeTitle(node)}}
+            <div class="command-bar" [class.invisible]="editNodeId">
+                <button mat-icon-button (click)="edit(node)" color="accent">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="remove(node)" color="accent">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
         </div>
-    </mat-tree-node>
+
+    </mat-tree-node> -->
 </mat-tree>

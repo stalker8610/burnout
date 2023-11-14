@@ -1,11 +1,13 @@
 <ng-container *ngIf="userAuthorized | async as userAuthorized; else loginBlock">
     <div>
-        {{userAuthorized.email}}
+        <span>
+            {{userName | async}}
+        </span>
+        <a mat-button href="/logout">
+            <mat-icon>logout</mat-icon>
+            Выйти
+        </a>
     </div>
-    <a mat-button href="/logout">
-        <mat-icon>logout</mat-icon>
-        Выйти
-    </a>
 
     <!-- <a mat-icon-button title="Выйти" href="/logout">
         <mat-icon>logout</mat-icon>

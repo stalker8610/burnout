@@ -2,31 +2,24 @@ import { createEffect } from "@ngrx/effects"
 import { AuthService, TLoginResult } from "../../services/auth.service"
 import { Actions, ofType } from "@ngrx/effects"
 import * as AuthActions from './auth.actions'
-import { map, catchError, exhaustMap, of, EMPTY, withLatestFrom, filter, tap } from "rxjs"
+import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core';
 import { Router } from "@angular/router"
 import { getAuthorizedUser, requestDone } from "./auth.selectors"
 import { Store } from "@ngrx/store"
+import { concatLatestFrom } from "@ngrx/effects"
 
-/* export const appStarted$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
-    actions$.pipe(
-        ofType(AuthActions.appStarted),
-        map(() => AuthActions.getAuthStatus())
-    ),
-    { functional: true }
-)
- */
 export const authStatusRequested$ = createEffect((actions$ = inject(Actions), store = inject(Store)) =>
     actions$.pipe(
         ofType(AuthActions.authStatusRequested),
-        withLatestFrom(store.select(requestDone)),
+        concatLatestFrom(()=>store.select(requestDone)),
         filter(([action, done]) => !done),
         exhaustMap(([action, done]) => of(AuthActions.getAuthStatus()))
     ),
     { functional: true }
 )
 
-export const getAuthStatus$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+export const getAuthStatus$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService)) =>
     actions$.pipe(
         ofType(AuthActions.getAuthStatus),
         exhaustMap(() => authService.getMe()
@@ -39,7 +32,7 @@ export const getAuthStatus$ = createEffect((actions$ = inject(Actions), authServ
     { functional: true }
 )
 
-export const getAuthStatusSuccessful$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+export const getAuthStatusSuccessful$ = createEffect((actions$ = inject(Actions)) =>
     actions$.pipe(
         ofType(AuthActions.getAuthStatusSuccessful),
         filter(data => !!data.user),
@@ -48,7 +41,7 @@ export const getAuthStatusSuccessful$ = createEffect((actions$ = inject(Actions)
     { functional: true }
 )
 
-export const getAuthStatusSuccessfulRedirect$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+export const getAuthStatusSuccessfulRedirect$ = createEffect((actions$ = inject(Actions), router = inject(Router)) =>
     actions$.pipe(
         ofType(AuthActions.getAuthStatusSuccessful),
         filter(data => !data.user),
@@ -62,7 +55,7 @@ export const getAuthStatusSuccessfulRedirect$ = createEffect((actions$ = inject(
 
 
 export const login$ = createEffect(
-    (actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+    (actions$ = inject(Actions), authService = inject(AuthService)) =>
         actions$.pipe(
             ofType(AuthActions.login),
             exhaustMap(({ email, password }) => authService.logIn(email, password)
@@ -96,7 +89,7 @@ export const loginSuccessful$ = createEffect(
     }
 )
 
-export const logout$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+export const logout$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService)) =>
     actions$.pipe(
         ofType(AuthActions.logout),
         tap(() => console.log('logout')),
@@ -112,7 +105,7 @@ export const logout$ = createEffect((actions$ = inject(Actions), authService = i
 )
 
 export const logoutSuccessful$ = createEffect(
-    (actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+    (actions$ = inject(Actions), router = inject(Router)) =>
         actions$.pipe(
             ofType(AuthActions.logoutSuccessful),
             tap(action => action.navigate && router.navigate(['/login']))

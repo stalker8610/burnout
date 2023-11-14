@@ -12,6 +12,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 import { AppRoutingModule } from './routing/router.module';
@@ -47,6 +48,10 @@ import { dataReducer } from './store/data/data.reducer';
 
 import * as authEffects from './store/auth/auth.effects';
 import * as dataEffects from './store/data/data.effects';
+import { CompanyEditComponent } from './company/company-edit/company-edit.component';
+import { RespondentComponent } from './company/respondent/respondent.component';
+import { DepartmentComponent } from './company/department/department.component';
+import { FocusableDirective } from './focusable.directive';
 
 @NgModule({
     declarations: [
@@ -67,7 +72,11 @@ import * as dataEffects from './store/data/data.effects';
         CompanyComponent,
         CompanyTreeComponent,
         LogoutComponent,
-        LoginStatusComponent
+        LoginStatusComponent,
+        CompanyEditComponent,
+        RespondentComponent,
+        DepartmentComponent,
+        FocusableDirective
     ],
     imports: [
         BrowserModule,
@@ -86,7 +95,8 @@ import * as dataEffects from './store/data/data.effects';
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         MatTreeModule,
-        StoreModule.forRoot({ auth: authReducer, data: dataReducer }, {}),
+        MatSnackBarModule,
+        StoreModule.forRoot({ auth: authReducer, company: dataReducer }, {}),
         EffectsModule.forRoot(authEffects, dataEffects),
         StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
     ],

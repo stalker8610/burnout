@@ -1,3 +1,25 @@
+.node {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.command-bar {
+    display: none;
+}
+
+.node:hover {
+    font-weight: 500;
+
+    .command-bar {
+        display: block;
+    }
+}
+
+.invisible {
+    display: none !important;
+}
+
 .department {
     /* font-weight: 500; */
     font-size: 18px;
@@ -5,4 +27,8 @@
 
 .respondent {
     font-size: 14px;
+}
+
+mat-form-field {
+    padding: 8px 0;
 }

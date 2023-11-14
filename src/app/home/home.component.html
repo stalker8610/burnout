@@ -1,15 +1,18 @@
 <mat-nav-list class="menu">
-    <mat-list-item routerLink="wall" routerLinkActive="active-link" ariaCurrentWhenActive="page">
-        Лента
-    </mat-list-item>
+
+    <ng-container *ngIf="(hasScope(Scopes.HR) | async) || (hasScope(Scopes.Admin) | async)">
+        <mat-list-item routerLink="wall" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+            Лента
+        </mat-list-item>
+        <mat-list-item routerLink="company" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+            Отчет по компании
+        </mat-list-item>
+        <mat-list-item routerLink="structure" routerLinkActive="active-link" ariaCurrentWhenActive="page">
+            Структура компании
+        </mat-list-item>
+    </ng-container>
     <mat-list-item routerLink="my" routerLinkActive="active-link" ariaCurrentWhenActive="page">
         Мой отчет
-    </mat-list-item>
-    <mat-list-item routerLink="company" routerLinkActive="active-link" ariaCurrentWhenActive="page">
-        Отчет по компании
-    </mat-list-item>
-    <mat-list-item routerLink="structure" routerLinkActive="active-link" ariaCurrentWhenActive="page">
-        Структура компании
     </mat-list-item>
 </mat-nav-list>
 
