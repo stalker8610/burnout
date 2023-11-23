@@ -1,9 +1,10 @@
+import { TCompanyStructure } from '@models/company.model';
 import { createReducer, on } from "@ngrx/store";
 import * as DataActions from "./data.actions";
-import { TCompanyStructure } from "src/app/services/data.service";
-import { TObjectId, TWithId } from "@models/common.model";
+import { TWithId } from "@models/common.model";
 import { IDepartment } from "@models/department.model";
 import { IRespondent } from "@models/respondent.model";
+
 
 export interface IState {
     data: TCompanyStructure | null,
@@ -69,6 +70,16 @@ export const dataReducer = createReducer(
         data: {
             ...state.data!,
             team: state.data!.team.filter(teammate => teammate._id !== payload.respondentId)
+        }
+    })),
+    on(DataActions.deactivateRespondentSuccessful, (state, payload) => ({
+        ...state,
+        data: {
+            ...state.data!,
+            team: [
+                ...state.data!.team.filter(teammate => teammate._id !== payload.respondent._id),
+                payload.respondent
+            ]
         }
     })),
     on(DataActions.removeRespondentFailed, (state, payload) => ({

@@ -9,8 +9,11 @@ import { SurveyComponent } from '../survey/survey.component';
 import { ReportWallComponent } from '../reports/report-wall/report-wall.component';
 import { CompanyComponent } from '../company/company.component';
 import { LogoutComponent } from '../auth/logout/logout.component';
+import { ReportMyComponent } from '../reports/report-my/report-my.component';
+import { ReportCompanyComponent } from '../reports/report-company/report-company.component';
 
-import { isAuthorizedGuard, isHRUserGuard, isNotAuthorizedGuard } from './guards.service';
+import { isAuthorizedGuard, isHRUserGuard, isNotAuthorizedGuard, redirectHomeGuard } from './guards.service';
+import { RespondentComponent } from '../company/respondent/respondent.component';
 
 
 const routes: Routes = [
@@ -18,33 +21,43 @@ const routes: Routes = [
     { path: 'login', canActivate: [isNotAuthorizedGuard], component: LoginComponent, pathMatch: 'full' },
     { path: 'logout', canActivate: [isAuthorizedGuard], component: LogoutComponent, pathMatch: 'full' },
     { path: 'survey/:surveyId', canActivate: [isAuthorizedGuard], component: SurveyComponent, pathMatch: 'full' },
+
     {
         path: 'home', component: HomeComponent, canActivate: [isAuthorizedGuard],
         children: [
             {
                 path: '',
-                redirectTo: 'wall',
+                canActivate: [redirectHomeGuard],
+                component: NotFoundComponent,
                 pathMatch: 'full'
             },
             {
                 path: 'wall',
+                canActivate: [isHRUserGuard],
                 component: ReportWallComponent,
                 pathMatch: 'full'
             },
             {
                 path: 'my',
-                component: NotFoundComponent,
+                component: ReportMyComponent,
+                pathMatch: 'full'
+            },
+            {
+                path: 'my-survey',
+                canActivate: [isAuthorizedGuard],
+                component: SurveyComponent,
+                pathMatch: 'full'
+            },
+            {
+                path: 'reports',
+                canActivate: [isHRUserGuard],
+                component: ReportCompanyComponent,
                 pathMatch: 'full'
             },
             {
                 path: 'company',
-                component: NotFoundComponent,
-                pathMatch: 'full'
-            },
-            {
-                path: 'structure',
-                component: CompanyComponent,
                 canActivate: [isHRUserGuard],
+                component: CompanyComponent,
                 pathMatch: 'full'
             },
         ]
@@ -55,7 +68,7 @@ const routes: Routes = [
 
 // configures NgModule imports and exports
 @NgModule({
-    imports: [RouterModule.forRoot(routes, /* { enableTracing: true } */)],
+    imports: [RouterModule.forRoot(routes/* , { enableTracing: true } */)],
     exports: [RouterModule],
     providers: [
         provideRouter(routes, withComponentInputBinding())]

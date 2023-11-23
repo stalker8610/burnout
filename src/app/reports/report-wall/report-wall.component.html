@@ -1,13 +1,20 @@
 <div class="container">
-    <div *ngFor="let item of records">
-        <div class="record">
-            <div class="text">
-                {{item.text}}
+    <div *ngFor="let item of records | async">
+        <div class="record-container">
+            <div class="record" [class.bad-record]="item.mood === SelfMood.Sad">
+                <div class="text">
+                    {{item.text}}
+                </div>
+                <img *ngIf="item.mood !== undefined" [src]="images[item.mood]" class="mood">
             </div>
-            <img *ngIf="item.mood !== undefined" [src]="images[item.mood]" class="mood">
-        </div>
-        <div class="date">
-            {{getDateView(item.date)}}
+            <div class="subscription">
+                <div class="date">
+                    {{getDateView(item.date)}}
+                </div>
+                <div class="name">
+                    {{item.respondent}}
+                </div>
+            </div>
         </div>
     </div>
 </div>

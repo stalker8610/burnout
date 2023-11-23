@@ -1,19 +1,12 @@
 .node {
-    display: flex;
+    /* display: flex; */
     align-items: center;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
-.command-bar {
-    display: none;
-}
 
 .node:hover {
-    font-weight: 500;
-
-    .command-bar {
-        display: block;
-    }
+    /* font-weight: 500; */
 }
 
 .invisible {
@@ -21,12 +14,43 @@
 }
 
 .department {
-    /* font-weight: 500; */
     font-size: 18px;
 }
 
 .respondent {
     font-size: 14px;
+    width: 100%;
+}
+
+.respondent-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    max-width: 600px;
+    /* mat-icon {
+        padding: 10px;
+    } */
+}
+
+.disabled-respondent {
+    opacity: 0.35;
+}
+
+.signedUp {
+    color: green;
+}
+
+.invited {
+    color: yellow;
+}
+
+.notInvitedYet {
+    color: red;
+}
+
+
+.email {
+    opacity: 0.7;
 }
 
 mat-form-field {

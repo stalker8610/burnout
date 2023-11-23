@@ -2,17 +2,24 @@
 import { TObjectId, TWithId } from "./common.model.js"
 import { IRespondent } from "./respondent.model.js";
 import { IDepartment } from "./department.model.js";
-import { ICompany } from "./company.model.js";
+
+export enum EOperationStatus {
+    Wait = 'wait', //wait for user
+    Pending = 'pending', //wait for server to complete operation
+    Complete = 'complete',
+    Failed = 'failed'
+}
 
 export type TQuestionType = 'wall' | 'company' | 'personal' | 'boolean' | 'checkbox'
 
 export interface ISurvey {
     respondentId: TObjectId<IRespondent>,
-    questions: TWithId<IQuestion | {}>[],
+    questions: TWithId<IQuestion>[],
     feedbackToId: TObjectId<IRespondent>,
     createdAt: Date,
     expiredAt: Date,
     finishedAt?: Date,
+    progress?: number
 }
 
 export interface IQuestion {
@@ -82,3 +89,8 @@ export interface ISurveyResultConfirmedAnswer extends ISurveyResultBasic {
     anonymous?: true,
     answer: TAnswer
 }
+
+export type ISurveyResult = ISurveyResultSkippedQuestion | ISurveyResultConfirmedAnswer
+
+
+export type TTeammate = TWithId<IRespondent> & { department: TWithId<IDepartment> } & { fullName: string };

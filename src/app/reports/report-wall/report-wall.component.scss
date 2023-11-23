@@ -4,12 +4,21 @@
     max-width: 600px;
 }
 
+.record-container {
+    margin-bottom: 10px;
+}
+
 .record {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     background-color: white;
+    border-radius: 8px;
+}
+
+.bad-record {
+    border: 2px solid red;
 }
 
 .mood {
@@ -23,7 +32,9 @@
     font-size: 18px;
 }
 
-.date {
-    margin: 2px 0 15px 10px;
+.subscription {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
     opacity: 0.75;
 }

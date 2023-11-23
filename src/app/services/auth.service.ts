@@ -12,6 +12,7 @@ export type TLoginResult = {
     companyId: TObjectId<ICompany>,
     respondentId: TObjectId<IRespondent>,
     scope: Scopes,
+    respondent: TWithId<IRespondent>
 }
 
 type TSignupResult = {}

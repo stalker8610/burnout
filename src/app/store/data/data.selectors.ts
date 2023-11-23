@@ -1,15 +1,14 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { IState } from './data.reducer';
 import { getAuthorizedUser } from '../auth/auth.selectors';
-import { IRespondent } from '@models/respondent.model';
+import { IRespondent, SignUpStatus } from '@models/respondent.model';
 import { TLoginResult } from 'src/app/services/auth.service';
 import { TObjectId, TWithId } from '@models/common.model';
 import { IDepartment } from '@models/department.model';
+import { concatRespondentName } from './data.util';
 
 const featureKey = 'company';
 interface FeatureState extends IState { }
-
-// selectFeature will have the type MemoizedSelector<object, FeatureState>
 const selectFeature = createFeatureSelector<FeatureState>(featureKey);
 
 export const getDataLoadError = createSelector(
@@ -17,9 +16,12 @@ export const getDataLoadError = createSelector(
     (state: IState) => state.error
 )
 
-export const getTeam = createSelector(
+export const getTeam = (withDisabled: boolean) => createSelector(
     selectFeature,
-    (state: IState) => state.data?.team
+    (state: IState) => {
+        if (withDisabled) return state.data?.team;
+        return state.data?.team.filter(teammate => teammate.signUpStatus !== SignUpStatus.Disabled);
+    }
 )
 
 export const getDepartments = createSelector(
@@ -29,28 +31,30 @@ export const getDepartments = createSelector(
 
 export const getRespondent = (_id: TObjectId<IRespondent>) => createSelector(
     selectFeature,
-    (state: IState) => state.data?.team.filter(respondent => respondent._id === _id)
+    (state: IState) => state.data?.team.find(respondent => respondent._id === _id)!
 )
 
 export const getTeamExceptAuthorizedUser = createSelector(
-    getTeam,
+    getTeam(false),
     getDepartments,
     getAuthorizedUser,
     (team: TWithId<IRespondent>[] | undefined, departments: TWithId<IDepartment>[] | undefined, authorizedUser?: TLoginResult | null) =>
         team?.filter(respondent => respondent._id !== authorizedUser?.respondentId)
             .map(respondent => ({
                 ...respondent,
-                department: departments?.find(department => department._id === respondent.departmentId)?._id
+                department: departments?.find(department => department._id === respondent.departmentId),
+                fullName: concatRespondentName(respondent)
             }))
-            .map(respondent => ({
-                ...respondent,
-                fullName: [respondent.lastName, respondent.firstName].join(' ')
-            }))
+)
+
+export const getTeammateForFeedback = (respondentId: TObjectId<IRespondent>) => createSelector(
+    getTeamExceptAuthorizedUser,
+    (team) => team?.find(respondent => respondent._id === respondentId)
 )
 
 export const getDepartmentsAndTeam = createSelector(
     getDepartments,
-    getTeam,
+    getTeam(true),
     (departments, team) => ({ departments, team })
 )
 
@@ -63,10 +67,4 @@ export const getCompanyId = createSelector(
 export const getLoaded = createSelector(
     selectFeature,
     (state: IState) => state.loaded
-)
-
-export const getAuthorizedUserData = createSelector(
-    getAuthorizedUser,
-    getTeam,
-    (user, team) => team?.find(teammate => teammate._id === user?.respondentId)
 )

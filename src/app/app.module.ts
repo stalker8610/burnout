@@ -13,7 +13,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDateFnsModule } from '@angular/material-date-fns-adapter';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule } from '@angular/material/dialog';
 
+import { ru } from 'date-fns/locale';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 import { AppRoutingModule } from './routing/router.module';
 
@@ -44,14 +51,23 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { authReducer } from './store/auth/auth.reducer';
 import { dataReducer } from './store/data/data.reducer';
-
-
+import { surveyReducer } from './store/survey/survey.reducer';
+import { reportWallReducer } from './store/reports/report-wall/report-wall.reducer';
+import { reportPassStatisticReducer } from './store/reports/report-pass-statistic/report-pass-statistic.reducer';
 import * as authEffects from './store/auth/auth.effects';
 import * as dataEffects from './store/data/data.effects';
+import * as surveyEffects from './store/survey/survey.effects';
+import * as reportWallEffects from './store/reports/report-wall/report-wall.effects';
+import * as reportPassStatisticEffects from './store/reports/report-pass-statistic/report-pass-statistic.effects';
+
 import { CompanyEditComponent } from './company/company-edit/company-edit.component';
 import { RespondentComponent } from './company/respondent/respondent.component';
 import { DepartmentComponent } from './company/department/department.component';
 import { FocusableDirective } from './focusable.directive';
+import { ReportMyComponent } from './reports/report-my/report-my.component';
+import { ReportCompanyComponent } from './reports/report-company/report-company.component';
+import { ReportPassStatisticComponent } from './reports/report-company/report-pass-statistic/report-pass-statistic.component';
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
     declarations: [
@@ -76,7 +92,10 @@ import { FocusableDirective } from './focusable.directive';
         CompanyEditComponent,
         RespondentComponent,
         DepartmentComponent,
-        FocusableDirective
+        FocusableDirective,
+        ReportMyComponent,
+        ReportCompanyComponent,
+        ReportPassStatisticComponent
     ],
     imports: [
         BrowserModule,
@@ -96,9 +115,26 @@ import { FocusableDirective } from './focusable.directive';
         MatAutocompleteModule,
         MatTreeModule,
         MatSnackBarModule,
-        StoreModule.forRoot({ auth: authReducer, company: dataReducer }, {}),
-        EffectsModule.forRoot(authEffects, dataEffects),
-        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
+        MatMenuModule,
+        MatDatepickerModule,
+        MatDateFnsModule,
+        MatSelectModule,
+        MatDialogModule,
+        StoreModule.forRoot({
+            auth: authReducer,
+            company: dataReducer,
+            survey: surveyReducer,
+            reportWall: reportWallReducer,
+            reportPassStatistic: reportPassStatisticReducer
+        }, {}),
+        EffectsModule.forRoot(
+            authEffects,
+            dataEffects,
+            surveyEffects,
+            reportWallEffects,
+            reportPassStatisticEffects),
+        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
+        NgChartsModule
     ],
     providers: [
         {
@@ -112,6 +148,10 @@ import { FocusableDirective } from './focusable.directive';
             useValue: {
                 hideRequiredMarker: true
             }
+        },
+        {
+            provide: MAT_DATE_LOCALE,
+            useValue: ru,
         }
     ],
     bootstrap: [AppComponent]

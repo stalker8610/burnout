@@ -1,35 +1,34 @@
+
 import { createEffect } from "@ngrx/effects"
-import { DataService, TCompanyStructure } from "../../services/data.service"
+import { DataService } from "../../services/data.service"
 import { Actions, ofType } from "@ngrx/effects"
 import * as DataActions from './data.actions'
 import * as AuthActions from '../auth/auth.actions'
 import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core'
 import { IDepartment } from "@models/department.model"
-import { TObjectId, TWithId } from "@models/common.model"
-import { IRespondent } from '@models/respondent.model';
+import { TWithId } from "@models/common.model"
+import { IRespondent, INewRespondent, SignUpStatus } from '@models/respondent.model';
 import { getAuthorizedUser } from "../auth/auth.selectors"
-import { ActionCreator, Store } from "@ngrx/store"
-import { getCompanyId, getLoaded } from './data.selectors'
+import { Store } from "@ngrx/store"
+import { getCompanyId, getLoaded, getRespondent } from './data.selectors'
 import { concatLatestFrom } from "@ngrx/effects"
 import { Scopes } from "@models/user.model"
 import { MatSnackBar } from "@angular/material/snack-bar"
+import { TCompanyStructure } from "@models/company.model"
+import { handleError } from "../error.handler"
 
 import { parseName, concatRespondentName } from "./data.util"
-
-interface IBackendError {
-    error: string,
-    message: string
-}
 
 export const loadDataRequested$ = createEffect(
     (actions$ = inject(Actions), store = inject(Store)) =>
         actions$.pipe(
             ofType(DataActions.loadRequested),
-            concatLatestFrom(() => store.select(getAuthorizedUser)),
-            concatLatestFrom(() => store.select(getLoaded)),
-            filter(([[action, user], loaded]) => !!user && !loaded),
-            exhaustMap(([[action, user], loaded]) => of(DataActions.load({ companyId: user!.companyId })))
+            concatLatestFrom(() => [
+                store.select(getAuthorizedUser),
+                store.select(getLoaded)]),
+            filter(([action, user, loaded]) => !!user && !loaded),
+            exhaustMap(([action, user, loaded]) => of(DataActions.load({ companyId: user!.companyId })))
         ),
     { functional: true }
 )
@@ -74,7 +73,7 @@ export const addDepartment$ = createEffect(
 
 
 export const addRespondentRequest$ = createEffect(
-    (actions$ = inject(Actions), store = inject(Store), dataService = inject(DataService)) =>
+    (actions$ = inject(Actions), store = inject(Store)) =>
         actions$.pipe(
             ofType(DataActions.addRespondentRequest),
             concatLatestFrom(() => store.select(getCompanyId)),
@@ -82,7 +81,7 @@ export const addRespondentRequest$ = createEffect(
             exhaustMap(([action, companyId]) => {
 
                 const nameParts = parseName(action.respondent.name);
-                const newRespondent: IRespondent = Object.assign({},
+                const newRespondent: INewRespondent = Object.assign({},
                     nameParts,
                     {
                         companyId: companyId!,
@@ -108,11 +107,11 @@ export const addRespondent$ = createEffect(
     (actions$ = inject(Actions), dataService = inject(DataService)) =>
         actions$.pipe(
             ofType(DataActions.addRespondent),
-            exhaustMap((action: { respondent: IRespondent }) =>
+            exhaustMap((action: { respondent: INewRespondent }) =>
                 dataService.addRespondent(action.respondent.companyId, action.respondent)
                     .pipe(
                         map((respondent: TWithId<IRespondent>) =>
-                            DataActions.addRespondentSuccessful({ respondent, message: `Сотрудник ${concatRespondentName(action.respondent)} добавлен` })),
+                            DataActions.addRespondentSuccessful({ respondent, message: `Сотрудник ${concatRespondentName(respondent)} добавлен` })),
                         catchError(handleError(DataActions.addRespondentFailed))
                     )
             )
@@ -124,10 +123,10 @@ export const addDepartmentAndRespondent = createEffect(
     (actions$ = inject(Actions), dataService = inject(DataService)) =>
         actions$.pipe(
             ofType(DataActions.addDepartmentWithRespondent),
-            exhaustMap((action: { respondent: IRespondent, department: IDepartment }) =>
+            exhaustMap((action: { respondent: INewRespondent, department: IDepartment }) =>
                 dataService.addDepartment(action.department.companyId, action.department).pipe(
                     exhaustMap((department: TWithId<IDepartment>) => {
-                        const respondent: IRespondent = {
+                        const respondent: INewRespondent = {
                             ...action.respondent,
                             departmentId: department._id
                         }
@@ -147,15 +146,22 @@ export const removeRespondent$ = createEffect(
     (actions$ = inject(Actions), dataService = inject(DataService), store = inject(Store)) =>
         actions$.pipe(
             ofType(DataActions.removeRespondent),
-            concatLatestFrom(() => store.select(getCompanyId)),
-            filter(([respondent, companyId]) => !!companyId),
-            exhaustMap(([respondent, companyId]) => dataService.removeRespondent(companyId!, respondent._id)
-                .pipe(
-                    map(data => DataActions.removeRespondentSuccessful({ respondentId: data._id, message: `Сотрудник удален` })),
-                    catchError(handleError(DataActions.removeRespondentFailed))
-                )
-            )
-        ),
+            concatLatestFrom((respondent) => [
+                store.select(getCompanyId),
+                store.select(getRespondent(respondent._id))]),
+            exhaustMap(([respondent, companyId, respondentData]) => {
+                if (respondentData?.signUpStatus === SignUpStatus.SingedUp) {
+                    return dataService.deactivateRespondent(companyId!, respondent._id).pipe(
+                        map(data => DataActions.deactivateRespondentSuccessful({ respondent: data, message: `Учетная запись деактивирована` })),
+                        catchError(handleError(DataActions.removeRespondentFailed))
+                    )
+                } else {
+                    return dataService.removeRespondent(companyId!, respondent._id).pipe(
+                        map(data => DataActions.removeRespondentSuccessful({ respondentId: data._id, message: `Учетная запись удалена` })),
+                        catchError(handleError(DataActions.removeRespondentFailed))
+                    )
+                }
+            })),
     { functional: true }
 )
 
@@ -211,7 +217,7 @@ export const patchDepartment$ = createEffect(
 )
 
 export const errorOccured$ = createEffect(
-    (actions$ = inject(Actions), dataService = inject(DataService), store = inject(Store)) => {
+    (actions$ = inject(Actions)) => {
 
         const snackBar = inject(MatSnackBar);
 
@@ -223,10 +229,9 @@ export const errorOccured$ = createEffect(
                 DataActions.patchDepartmentFailed,
                 DataActions.patchRespondentFailed,
                 DataActions.removeDepartmentFailed,
-                DataActions.removeRespondentFailed
+                DataActions.removeRespondentFailed,
             ),
             tap(action => {
-                /* console.log('error catched', action.message); */
                 snackBar.open(action.message, 'Закрыть', {
                     duration: 3000
                 });
@@ -241,7 +246,7 @@ export const errorOccured$ = createEffect(
 
 
 export const doneSuccessful$ = createEffect(
-    (actions$ = inject(Actions), dataService = inject(DataService), store = inject(Store)) => {
+    (actions$ = inject(Actions)) => {
 
         const snackBar = inject(MatSnackBar);
 
@@ -252,10 +257,10 @@ export const doneSuccessful$ = createEffect(
                 DataActions.patchDepartmentSuccessful,
                 DataActions.patchRespondentSuccessful,
                 DataActions.removeDepartmentSuccessful,
-                DataActions.removeRespondentSuccessful
+                DataActions.removeRespondentSuccessful,
+                DataActions.deactivateRespondentSuccessful
             ),
             tap(action => {
-
                 snackBar.open(action.message, 'Закрыть', {
                     duration: 3000
                 });
@@ -270,7 +275,5 @@ export const doneSuccessful$ = createEffect(
 
 
 
-const handleError = (actionCreator: any, message?: string) => {
-    return (error: IBackendError) => of(actionCreator({ error: message || error.error || error.message }))
-}
+
 

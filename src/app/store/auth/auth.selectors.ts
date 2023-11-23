@@ -3,8 +3,6 @@ import { IState } from './auth.reducer';
 
 const featureKey = 'auth';
 interface FeatureState extends IState { }
-
-// selectFeature will have the type MemoizedSelector<object, FeatureState>
 const selectFeature = createFeatureSelector<FeatureState>(featureKey);
 
 export const getLoginError = createSelector(
@@ -19,7 +17,7 @@ export const getLogoutError = createSelector(
 
 export const requestDone = createSelector(
     selectFeature,
-    (state: IState) => state.done
+    (state: IState) => state.getMeRequestDone
 )
 
 export const getAuthorizedUser = createSelector(

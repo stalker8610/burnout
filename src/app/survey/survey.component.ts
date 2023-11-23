@@ -1,16 +1,15 @@
-import { TObjectId, TWithId } from '@models/common.model';
-import { DataService, TTeammate, TTeam } from '../services/data.service';
-import { SurveyService } from '../services/survey.service';
+import { TObjectId } from '@models/common.model';
 import { Component, Input, OnInit } from '@angular/core';
 import { Type } from '@angular/core';
-import { TQuestionConfirmedAnswer, TQuestionSkipped, IQuestion, ISurvey } from '@models/survey.model';
+import { IQuestion } from '@models/survey.model';
+import { Store } from '@ngrx/store';
+import { loadRequested } from '../store/survey/survey.actions';
+import { filter, delay, map } from 'rxjs';
+import { TTeammate } from '@models/survey.model';
 
-
-import { QuestionCardWallComponent } from '../cards/question-card-wall/question-card-wall.component';
-import { QuestionCardCompanyComponent } from '../cards/question-card-company/question-card-company.component';
-import { QuestionCardTeamAssertCheckboxComponent } from '../cards/question-card-team-assert-checkbox/question-card-team-assert-checkbox.component';
-import { QuestionCardPersonalComponent } from '../cards/question-card-personal/question-card-personal.component';
-import { QuestionCardTeamAssertBooleanComponent } from '../cards/question-card-team-assert-boolean/question-card-team-assert-boolean.component';
+import { getAuthorizedUser } from '../store/auth/auth.selectors';
+import { getLoaded, getSurvey } from '../store/survey/survey.selectors';
+import { loadRequested as loadCompanyStrucureRequested} from '../store/data/data.actions';
 
 interface AbstractQuestionInputData {
     questionId: TObjectId<IQuestion>,
@@ -28,11 +27,11 @@ export interface TeammateFeedbackQuestionInputData extends AbstractQuestionInput
 }
 
 export interface TeamAssertBooleanQuestionInputData extends AbstractQuestionInputData {
-    team: TTeam
+    team: TTeammate[]
 }
 
 export interface TeamAssertCheckboxQuestionInputData extends AbstractQuestionInputData {
-    team: TTeam
+    team: TTeammate[]
 }
 
 export type QuestionInputData =
@@ -54,83 +53,31 @@ export class QuestionItem {
 export class SurveyComponent implements OnInit {
 
     @Input() surveyId: string = '';
-    surveyCompleted = false;
 
-    survey!: TWithId<ISurvey>;
-    questions: QuestionItem[] = [];
-    errorMessage: string = '';
+    loaded = this.store.select(getLoaded);
+    survey = this.store.select(getSurvey);
+    surveyCompleted = this.survey.pipe(
+        map(survey => !!survey?.finishedAt)
+    )
 
-    constructor(private readonly surveyService: SurveyService,
-        private readonly dataService: DataService) { }
+    constructor(private store: Store) { }
 
     ngOnInit() {
-        this.surveyService.getQuestions(this.surveyId)
-            .subscribe(value => {
-                this.survey = value;
-                value.questions.forEach(question => {
-                    const questionItem = this.createQuestionItem(question as TWithId<IQuestion>);
-                    this.questions.push(questionItem)
-                });
-            })
-    }
 
-    createQuestionItem(question: TWithId<IQuestion>) {
+        this.store.dispatch(loadCompanyStrucureRequested());
 
-        switch (question.type) {
-            case 'wall': return new QuestionItem(QuestionCardWallComponent,
-                {
-                    questionId: question._id,
-                    title: question.title
-                });
-            case 'personal': return new QuestionItem(QuestionCardPersonalComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    //teammate: this.dataService.getRespondent(this.survey.feedbackToId)
-                });
-            case 'boolean': return new QuestionItem(QuestionCardTeamAssertBooleanComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    //team: this.dataService.getTeam()
-                });
-            case 'checkbox': return new QuestionItem(QuestionCardTeamAssertCheckboxComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    subtitle: 'Выберите, кто из коллег, как правило...',
-                    //team: this.dataService.getTeam()
-                });
-            case 'company': return new QuestionItem(QuestionCardCompanyComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    subtitle: 'Насколько вы согласны со следующим утверждением?',
-                });
-            default: throw 'Unknown question type';
+        if (!this.surveyId) {
+            this.store.select(getAuthorizedUser)
+                .pipe(
+                    filter(user => !!user),
+                    /* delay(1000) */)
+                .subscribe(
+                    user => this.store.dispatch(loadRequested({ respondentId: user!.respondentId }))
+                )
+        } else {
+            this.store.dispatch(loadRequested({ surveyId: this.surveyId }))
         }
-    }
 
-    onAnswerConfirmed(answer: TQuestionConfirmedAnswer) {
-        this.errorMessage = '';
-        return this.surveyService.confirmAnswer(this.surveyId, answer);
     }
-
-    onQuestionSkipped(skipped: TQuestionSkipped) {
-        this.errorMessage = '';
-        return this.surveyService.skipQuestion(this.surveyId, skipped);
-    }
-
-    onSurveyCompleted($event: any) {
-        this.surveyCompleted = true;
-        this.surveyService.completeSurvey(this.surveyId)
-            .subscribe({
-                error: console.log
-            });
-    }
-
-    onErrorOccured(error: string) {
-        this.errorMessage = error;
-        console.log('errorOccured', this.errorMessage);
-    }
+    
 }

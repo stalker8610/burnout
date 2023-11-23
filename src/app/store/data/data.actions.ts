@@ -1,9 +1,9 @@
 import { createAction, props } from "@ngrx/store";
 import { ICompany } from '@models/company.model';
-import { TCompanyStructure } from 'src/app/services/data.service';
-import { IRespondent } from '@models/respondent.model';
+import { IRespondent, INewRespondent } from '@models/respondent.model';
 import { IDepartment } from '@models/department.model';
-import { TWithId, TObjectId } from '@models/common.model';
+import { TWithId, TObjectId, IWithMessage } from '@models/common.model';
+import { TCompanyStructure } from "@models/company.model";
 
 enum EDataActions {
 
@@ -27,6 +27,7 @@ enum EDataActions {
 
     RemoveRespondent = '[Company Structure Page] Remove Respondent',
     RemoveRespondentSuccessful = '[Data API] Remove Respondent Successful',
+    DeactivateRespondentSuccessful = '[Data API] Deactivate Respondent Successful',
     RemoveRespondentFailed = '[Data API] Remove Respondent Failed',
 
     RemoveDepartment = '[Company Structure Page] Remove Department',
@@ -57,7 +58,7 @@ export const load = createAction(
 
 export const loadFailed = createAction(
     EDataActions.LoadDataFailed,
-    props<{ message: string }>()
+    props<IWithMessage>()
 )
 
 export const loadSuccessful = createAction(
@@ -76,12 +77,12 @@ export const addDepartment = createAction(
 
 export const addDepartmentSuccessful = createAction(
     EDataActions.AddDepartmentSuccessful,
-    props<{ department: TWithId<IDepartment>, message: string }>()
+    props<{ department: TWithId<IDepartment> } & IWithMessage>()
 )
 
 export const addDepartmentFailed = createAction(
     EDataActions.AddDepartmentFailed,
-    props<{ message: string }>()
+    props<IWithMessage>()
 )
 
 
@@ -107,22 +108,22 @@ export const addRespondentRequest = createAction(
 
 export const addRespondent = createAction(
     EDataActions.AddRespondent,
-    props<{ respondent: IRespondent }>()
+    props<{ respondent: INewRespondent }>()
 )
 
 export const addRespondentSuccessful = createAction(
     EDataActions.AddRespondentSuccessful,
-    props<{ respondent: TWithId<IRespondent>, message: string }>()
+    props<{ respondent: TWithId<IRespondent> } & IWithMessage>()
 )
 
 export const addRespondentFailed = createAction(
     EDataActions.AddRespondentFailed,
-    props<{ message: string }>()
+    props<IWithMessage>()
 )
 
 export const addDepartmentWithRespondent = createAction(
     EDataActions.AddDepartmentWithRespondent,
-    props<{ respondent: IRespondent, department: IDepartment }>()
+    props<{ respondent: INewRespondent, department: IDepartment }>()
 )
 
 export const removeRespondent = createAction(
@@ -130,14 +131,19 @@ export const removeRespondent = createAction(
     props<Pick<TWithId<IRespondent>, '_id'>>()
 )
 
+export const deactivateRespondentSuccessful = createAction(
+    EDataActions.DeactivateRespondentSuccessful,
+    props<{ respondent: TWithId<IRespondent> } & IWithMessage>()
+)
+
 export const removeRespondentSuccessful = createAction(
     EDataActions.RemoveRespondentSuccessful,
-    props<{ respondentId: TObjectId<IRespondent>, message: string }>()
+    props<{ respondentId: TObjectId<IRespondent> } & IWithMessage>()
 )
 
 export const removeRespondentFailed = createAction(
     EDataActions.RemoveRespondentFailed,
-    props<{ respondentId: TObjectId<IRespondent>, message: string }>()
+    props<{ respondentId: TObjectId<IRespondent> } & IWithMessage>()
 )
 
 export const removeDepartment = createAction(
@@ -147,12 +153,12 @@ export const removeDepartment = createAction(
 
 export const removeDepartmentSuccessful = createAction(
     EDataActions.RemoveRespondentSuccessful,
-    props<{ departmentId: TObjectId<IDepartment>, message: string }>()
+    props<{ departmentId: TObjectId<IDepartment> } & IWithMessage>()
 )
 
 export const removeDepartmentFailed = createAction(
     EDataActions.RemoveRespondentFailed,
-    props<{ departmentId: TObjectId<IDepartment>, message: string }>()
+    props<{ departmentId: TObjectId<IDepartment> } & IWithMessage>()
 )
 
 export const patchRespondent = createAction(
@@ -162,12 +168,12 @@ export const patchRespondent = createAction(
 
 export const patchRespondentSuccessful = createAction(
     EDataActions.PatchRespondentSuccessful,
-    props<{ respondent: TWithId<IRespondent>, message: string }>()
+    props<{ respondent: TWithId<IRespondent> } & IWithMessage>()
 )
 
 export const patchRespondentFailed = createAction(
     EDataActions.PatchRespondentFailed,
-    props<{ respondent: TWithId<Partial<IRespondent>>, message: string }>()
+    props<{ respondent: TWithId<Partial<IRespondent>> } & IWithMessage>()
 )
 
 export const patchDepartment = createAction(
@@ -177,10 +183,10 @@ export const patchDepartment = createAction(
 
 export const patchDepartmentSuccessful = createAction(
     EDataActions.PatchDepartmentSuccessful,
-    props<{ department: TWithId<IDepartment>, message: string }>()
+    props<{ department: TWithId<IDepartment> } & IWithMessage>()
 )
 
 export const patchDepartmentFailed = createAction(
     EDataActions.PatchDepartmentFailed,
-    props<{ department: TWithId<Partial<IDepartment>>, message: string }>()
+    props<{ department: TWithId<Partial<IDepartment>> } & IWithMessage>()
 )

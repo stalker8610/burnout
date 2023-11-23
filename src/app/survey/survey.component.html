@@ -1,24 +1,29 @@
 <div>
-    <div *ngIf="surveyCompleted; else questionBlock" class="completed">
-        <img src="assets/images/survey-completed.png">
-        <div>Вот и все! Отличная работа!</div>
+
+    <div *ngIf="!(loaded | async); else loadedBlock" class="spinner">
+        <mat-progress-spinner mode="indeterminate" diameter="50" strokeWidth="2" color="accent"></mat-progress-spinner>
     </div>
-    <ng-template #questionBlock>
-        <div class="container">
-            <app-question-card-container *ngIf="questions.length; else loadingBlock" [questions]="questions"
-                [onAnswerConfirmed]="onAnswerConfirmed.bind(this)" [onQuestionSkipped]="onQuestionSkipped.bind(this)"
-                (surveyCompleted)="onSurveyCompleted($event)" (errorOccured)="onErrorOccured($event)">
-            </app-question-card-container>
-            <ng-template #loadingBlock>
-                <div class="spinner">
-                    <mat-progress-spinner mode="indeterminate" diameter="50" strokeWidth="2"
-                        color="accent"></mat-progress-spinner>
+
+    <ng-template #loadedBlock>
+
+        <div *ngIf="survey | async as survey; else surveyNotFoundBlock">
+            <div *ngIf="surveyCompleted | async; else questionBlock" class="completed">
+                <img src="assets/images/survey-completed.png">
+                <div>Вот и все! Отличная работа!</div>
+            </div>
+            <ng-template #questionBlock>
+                <div class="container">
+                    <app-question-card-container [surveyId]="survey._id" [questionsAmount]="survey.questions.length"
+                        [feedbackToId]="survey.feedbackToId">
+                    </app-question-card-container>
                 </div>
             </ng-template>
-            <div *ngIf="errorMessage" class="error-container">
-                Упс.. кажется, у нас что-то сломалось! Попробуйте еще раз или вернитесь к опросу попозже
-            </div>
         </div>
 
+        <ng-template #surveyNotFoundBlock >
+            <div class="not-found">
+                На текущий момент все опросы пройдены!
+            </div>
+        </ng-template>
     </ng-template>
 </div>

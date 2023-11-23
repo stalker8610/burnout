@@ -1,4 +1,4 @@
-import { IRespondent } from '@models/respondent.model';
+import { IRespondent, SignUpStatus } from '@models/respondent.model';
 import { IDepartment } from '@models/department.model';
 import { TObjectId } from '@models/common.model';
 import { map, switchMap, tap, of } from 'rxjs';
@@ -10,22 +10,36 @@ import { getDepartmentsAndTeam, getTeam } from '../../store/data/data.selectors'
 import { concatRespondentName, parseName } from 'src/app/store/data/data.util';
 import { removeDepartment, removeRespondent, patchRespondent, patchDepartment } from 'src/app/store/data/data.actions';
 import { FormControl } from '@angular/forms';
+import { getSignUpStatusView } from 'src/app/store/data/data.util';
+import { MatDialog } from '@angular/material/dialog';
+import { RespondentComponent } from '../respondent/respondent.component';
 
 enum ENodeTypes {
     Department = 'department',
     Respondent = 'respondent'
 }
 
-interface IFlatNode extends ITreeNode {
-    level: number;
-}
-
-interface ITreeNode {
-    _id: TObjectId<IDepartment | IRespondent>,
+interface INode {
     childCount: number,
     expandable: boolean;
     title: string;
-    type: ENodeTypes;
+}
+
+interface IDepartmentNode extends INode {
+    _id: TObjectId<IDepartment>,
+    type: ENodeTypes.Department
+}
+
+interface IRespondentNode extends INode {
+    _id: TObjectId<IRespondent>,
+    type: ENodeTypes.Respondent,
+    signUpStatus: SignUpStatus,
+    email: string
+}
+
+type ITreeNode = IDepartmentNode | IRespondentNode
+type IFlatNode = ITreeNode & {
+    level: number;
 }
 
 @Component({
@@ -52,7 +66,7 @@ export class CompanyTreeComponent implements OnInit {
         this._transformer,
         node => node.level,
         node => node.expandable,
-        node => this.store.select(getTeam).pipe(
+        node => this.store.select(getTeam(true)).pipe(
             map(respondents =>
                 (respondents?.filter(respondent => respondent.departmentId === node._id)
                     .map(respondent => ({
@@ -60,6 +74,8 @@ export class CompanyTreeComponent implements OnInit {
                         type: ENodeTypes.Respondent,
                         title: this.respondentName(respondent),
                         expandable: false,
+                        email: respondent.email,
+                        signUpStatus: respondent.signUpStatus,
                     })) || [])
                     .sort((a, b) => a.title.localeCompare(b.title)) as Array<ITreeNode>
             )
@@ -71,7 +87,7 @@ export class CompanyTreeComponent implements OnInit {
     editNode: IFlatNode | null = null;
     editNodeControl = new FormControl('');
 
-    constructor(private store: Store) { }
+    constructor(private store: Store, public respondentDialog: MatDialog) { }
 
     ngOnInit(): void {
         this.store.select(getDepartmentsAndTeam)
@@ -92,29 +108,32 @@ export class CompanyTreeComponent implements OnInit {
                 )
             ).subscribe(
                 data => {
+                    if (!this.dataSource.data.length) {
+                        this.dataSource.data = data;
+                        this.treeControl.expandAll();
+                    } else {
+                        // re-expand nodes after new node was added
+                        const expandedNodes: IFlatNode['_id'][] = [];
+                        if (this.treeControl.dataNodes) {
+                            this.treeControl.dataNodes.forEach(node => {
+                                if (this.treeControl.isExpandable(node) && this.treeControl.isExpanded(node)) {
+                                    expandedNodes.push(node._id);
+                                }
+                            });
+                        }
 
-                    const expandedNodes: IFlatNode['_id'][] = [];
-                    if (this.treeControl.dataNodes) {
-                        this.treeControl.dataNodes.forEach(node => {
-                            if (this.treeControl.isExpandable(node) && this.treeControl.isExpanded(node)) {
-                                expandedNodes.push(node._id);
-                            }
-                        });
+                        this.dataSource.data = data;
+
+                        this.treeControl.dataNodes
+                            .filter(node => expandedNodes.find(_id => _id === node._id))
+                            .forEach(nodeToExpand => {
+                                if (this.treeControl.isExpandable(nodeToExpand)) {
+                                    this.treeControl.expand(nodeToExpand);
+                                }
+                            });
                     }
 
-                    this.dataSource.data = data;
-
-                    this.treeControl.dataNodes
-                        .filter(node => expandedNodes.find(_id => _id === node._id))
-                        .forEach(nodeToExpand => {
-                            if (this.treeControl.isExpandable(nodeToExpand)) {
-                                this.treeControl.expand(nodeToExpand);
-                            }
-                        });
-
                 });
-
-        ;
     }
 
     hasChild = (_: number, node: IFlatNode) => node.expandable;
@@ -123,7 +142,8 @@ export class CompanyTreeComponent implements OnInit {
         return {
             'node': true,
             'department': node.type === ENodeTypes.Department,
-            'respondent': node.type === ENodeTypes.Respondent
+            'respondent': node.type === ENodeTypes.Respondent,
+            'disabled-respondent': node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.Disabled
         }
     }
 
@@ -135,6 +155,27 @@ export class CompanyTreeComponent implements OnInit {
         return title;
     }
 
+    removable = (node: IFlatNode) => {
+        return node.type === ENodeTypes.Respondent && (node.signUpStatus === SignUpStatus.NotInvitedYet ||
+            node.signUpStatus === SignUpStatus.Invited);
+    }
+
+    invitable = (node: IFlatNode) => {
+        return node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.NotInvitedYet;
+    }
+
+    isDisabled = (node: IFlatNode) => {
+        return node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.Disabled;
+    }
+
+    getSignUpStatusClass = (status: SignUpStatus) => {
+        return {
+            signedUp: status === SignUpStatus.SingedUp,
+            invited: status === SignUpStatus.Invited,
+            notInvitedYet: status === SignUpStatus.NotInvitedYet
+        }
+    }
+
     trackByFn = (index: number, item: IFlatNode) => {
         return item;
     }
@@ -144,8 +185,9 @@ export class CompanyTreeComponent implements OnInit {
     }
 
     edit(node: IFlatNode) {
-        this.editNode = node;
-        this.editNodeControl.reset(node.title);
+        /* this.editNode = node;
+        this.editNodeControl.reset(node.title); */
+        this.openRespondentDialog(node._id);
     }
 
     confirmEdit() {
@@ -173,6 +215,8 @@ export class CompanyTreeComponent implements OnInit {
         this.editNodeControl.reset();
     }
 
+
+
     cancelEdit() {
         this.editNode = null;
         this.editNodeControl.reset();
@@ -185,4 +229,16 @@ export class CompanyTreeComponent implements OnInit {
             this.store.dispatch(removeDepartment({ _id: node._id }))
         }
     }
+
+
+    openRespondentDialog(respondentId: TObjectId<IRespondent>): void {
+        this.respondentDialog.open(RespondentComponent, {
+            width: '600px',
+            disableClose: true,
+            data: { respondentId }
+        });
+    }
+
+
+    getSignUpStatusView = getSignUpStatusView;
 }

@@ -5,16 +5,17 @@ import * as AuthActions from './auth.actions'
 import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core';
 import { Router } from "@angular/router"
-import { getAuthorizedUser, requestDone } from "./auth.selectors"
+import { requestDone } from "./auth.selectors"
 import { Store } from "@ngrx/store"
 import { concatLatestFrom } from "@ngrx/effects"
+import { MatSnackBar } from "@angular/material/snack-bar"
 
 export const authStatusRequested$ = createEffect((actions$ = inject(Actions), store = inject(Store)) =>
     actions$.pipe(
         ofType(AuthActions.authStatusRequested),
-        concatLatestFrom(()=>store.select(requestDone)),
+        concatLatestFrom(() => store.select(requestDone)),
         filter(([action, done]) => !done),
-        exhaustMap(([action, done]) => of(AuthActions.getAuthStatus()))
+        exhaustMap(() => of(AuthActions.getAuthStatus()))
     ),
     { functional: true }
 )
@@ -25,18 +26,17 @@ export const getAuthStatus$ = createEffect((actions$ = inject(Actions), authServ
         exhaustMap(() => authService.getMe()
             .pipe(
                 map((authorizedUser: TLoginResult | null) => AuthActions.getAuthStatusSuccessful({ user: authorizedUser })),
-                catchError((error: { message: string }) => of(AuthActions.getAuthStatusFailed({ error: error.message })))
+                catchError((error: { message: string, status: number }) => {
+                    let message = error.message;
+                    if (error.status === 504) {
+                        message = 'Сервер недоступен. Попробуйте позже';
+                    } else if (error.status === 500) {
+                        message = 'Произошла ошибка на сервере. Попробуйте позже'
+                    }
+                    return of(AuthActions.getAuthStatusFailed({ message }))
+                })
             )
         )
-    ),
-    { functional: true }
-)
-
-export const getAuthStatusSuccessful$ = createEffect((actions$ = inject(Actions)) =>
-    actions$.pipe(
-        ofType(AuthActions.getAuthStatusSuccessful),
-        filter(data => !!data.user),
-        exhaustMap(data => of(AuthActions.loginSuccessful({ ...data.user!, navigate: false })))
     ),
     { functional: true }
 )
@@ -60,16 +60,16 @@ export const login$ = createEffect(
             ofType(AuthActions.login),
             exhaustMap(({ email, password }) => authService.logIn(email, password)
                 .pipe(
-                    map((authorizedUser: TLoginResult) => AuthActions.loginSuccessful({ ...authorizedUser, navigate: true })),
+                    map(() => AuthActions.loginSuccessful()),
                     catchError((error: { status: number }) => {
                         console.log(error);
                         let message = 'Неправильный логин или пароль';
                         if (error.status === 504) {
                             message = 'Сервер недоступен. Попробуйте позже';
                         } else if (error.status === 500) {
-                            message = 'Произошла ошибка на сервере. Попробуйте позже'
+                            message = 'Произошла ошибка на сервере. Обратитесь в техподдержку'
                         }
-                        return of(AuthActions.loginFailed({ error: message }))
+                        return of(AuthActions.loginFailed({ message }))
                     })
                 )
             )
@@ -77,11 +77,11 @@ export const login$ = createEffect(
     { functional: true }
 )
 
-export const loginSuccessful$ = createEffect(
-    (actions$ = inject(Actions), authService = inject(AuthService), router = inject(Router)) =>
+export const loginSuccessfulRedirect$ = createEffect(
+    (actions$ = inject(Actions), router = inject(Router)) =>
         actions$.pipe(
             ofType(AuthActions.loginSuccessful),
-            tap(action => action.navigate && router.navigate(['/']))
+            tap(() => router.navigate(['/']))
         ),
     {
         functional: true,
@@ -95,21 +95,44 @@ export const logout$ = createEffect((actions$ = inject(Actions), authService = i
         tap(() => console.log('logout')),
         exhaustMap(() => authService.logOut()
             .pipe(
-                map(() => AuthActions.logoutSuccessful({ navigate: true })),
-                /* tap(() => router.navigate(['/login'])), */
-                catchError((error: { message: string }) => of(AuthActions.logoutFailed({ error: error.message })))
+                map(() => AuthActions.logoutSuccessful()),
+                catchError((error: { message: string }) => of(AuthActions.logoutFailed({ message: error.message })))
             )
         )
     ),
     { functional: true }
 )
 
-export const logoutSuccessful$ = createEffect(
+export const logoutSuccessfulRedirect$ = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) =>
         actions$.pipe(
             ofType(AuthActions.logoutSuccessful),
-            tap(action => action.navigate && router.navigate(['/login']))
+            tap(() => router.navigate(['/']))
         ),
+    {
+        functional: true,
+        dispatch: false
+    }
+)
+
+export const errorOccured$ = createEffect(
+    (actions$ = inject(Actions)) => {
+
+        const snackBar = inject(MatSnackBar);
+
+        return actions$.pipe(
+            ofType(
+                AuthActions.getAuthStatusFailed,
+                AuthActions.logoutFailed
+            ),
+            tap(action => {
+                if (action.message)
+                    snackBar.open(action.message, 'Закрыть', {
+                        duration: 3000
+                    });
+            })
+        )
+    },
     {
         functional: true,
         dispatch: false

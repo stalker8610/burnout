@@ -1,4 +1,4 @@
-<div class="host-container" [class.disabled]="blockInterface">
+<div class="host-container" [class.disabled]="blockInterface | async">
     <div class="header">
         <div class="title">
             <div *ngIf="subtitle" class="subtitle">
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="index">
-            {{questionIndex+1}} из {{questions.length}}
+            {{(currentQuestionIndex | async)! + 1}} из {{questionsAmount}}
         </div>
     </div>
     <div class="container">

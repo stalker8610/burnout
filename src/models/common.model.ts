@@ -16,3 +16,6 @@ export interface IWithCompanyId {
     companyId: TObjectId<ICompany>
 }
 
+export interface IWithMessage {
+    message: string
+}

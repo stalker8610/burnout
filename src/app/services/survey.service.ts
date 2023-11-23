@@ -1,47 +1,35 @@
-
-
 import { Injectable } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TWithId, TObjectId } from '@models/common.model';
 import { TQuestionConfirmedAnswer, TQuestionSkipped, ISurvey } from '@models/survey.model';
-import { AbstractHttpService } from './http.service';
+import { IRespondent } from '@models/respondent.model';
 
 @Injectable({
     providedIn: 'root'
 })
-export class SurveyService extends AbstractHttpService {
+export class SurveyService {
 
-    constructor(httpClient: HttpClient) {
-        super(httpClient);
+    constructor(private httpClient: HttpClient) { }
+
+    getLastSurveyForRespondent(respondentId: TObjectId<IRespondent>) {
+        return this.httpClient.get<TWithId<ISurvey> | null>(`/api/surveys/respondent/${respondentId}`)
     }
 
-    getQuestions(surveyId: TObjectId<ISurvey>): Observable<TWithId<ISurvey>> {
-        return this.pipeRequest(this.httpClient.get<TWithId<ISurvey>>(`/api/surveys/${surveyId}`))
-        /* .pipe(
-            delay(1000), only for test!!!
-        ); */
+    getSurveyById(surveyId: TObjectId<ISurvey>): Observable<TWithId<ISurvey>> {
+        return this.httpClient.get<TWithId<ISurvey>>(`/api/surveys/${surveyId}`)
     }
 
     confirmAnswer(surveyId: TObjectId<ISurvey>, answer: TQuestionConfirmedAnswer) {
-        return this.pipeRequest(
-            this.httpClient.post(`/api/surveys/${surveyId}/confirmAnswer`, answer, { responseType: 'text' })
-        );
+        return this.httpClient.post(`/api/surveys/${surveyId}/confirmAnswer`, answer, { responseType: 'text' })
     }
 
     skipQuestion(surveyId: TObjectId<ISurvey>, skipped: TQuestionSkipped) {
-        console.log('skipped');
-        return this.pipeRequest(
-            this.httpClient.post(`/api/surveys/${surveyId}/skipQuestion`, skipped, { responseType: 'text' })
-        );
+        return this.httpClient.post(`/api/surveys/${surveyId}/skipQuestion`, skipped, { responseType: 'text' })
     }
 
     completeSurvey(surveyId: TObjectId<ISurvey>) {
-        console.log('completed');
-        return this.pipeRequest(
-            this.httpClient.post(`/api/surveys/${surveyId}/complete`, {}, { responseType: 'text' })
-        );
+        return this.httpClient.post<TWithId<ISurvey>>(`/api/surveys/${surveyId}/complete`, {})
     }
 
 }

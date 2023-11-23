@@ -1,8 +1,9 @@
 import { IRespondent } from "@models/respondent.model";
+import { Scopes } from "@models/user.model";
+import { SignUpStatus } from "@models/respondent.model";
 
-export const concatRespondentName = (respondent: IRespondent) => {
+export const concatRespondentName = (respondent: IRespondent ) => {
     return `${respondent.lastName || ''} ${respondent.firstName || ''} ${respondent.middleName || ''}`.trim();
-
 }
 
 export const parseName = (name: string) => {
@@ -27,4 +28,21 @@ export const parseName = (name: string) => {
 
     return result;
 
+}
+
+export function getScopeView(scope: Scopes) {
+    switch (scope) {
+        case Scopes.User: return 'Пользователь';
+        case Scopes.HR: return 'HR-менеджер';
+        default: return 'Другое'
+    }
+}
+
+export function getSignUpStatusView(status: SignUpStatus) {
+    switch (status) {
+        case SignUpStatus.Invited: return 'Приглашение на регистрацию отправлено';
+        case SignUpStatus.NotInvitedYet: return 'Приглашение на регистрацию не отправлено';
+        case SignUpStatus.SingedUp: return 'Зарегистрирован(-a)';
+        case SignUpStatus.Disabled: return 'Учетная запись отключена';
+    }
 }

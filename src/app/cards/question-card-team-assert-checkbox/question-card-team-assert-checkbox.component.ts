@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TTeammate } from '../../services/data.service';
 import { FormControl } from '@angular/forms';
 import { debounce, startWith, timer } from 'rxjs';
 import { QuestionComponent } from '../question.interface';
@@ -7,6 +6,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { TeamAssertCheckboxQuestionInputData } from 'src/app/survey/survey.component';
 import { TAnswerTeamAssertCheckbox } from '@models/survey.model';
+import { getTeamExceptAuthorizedUser } from 'src/app/store/data/data.selectors';
+import { Store } from '@ngrx/store';
+import { map } from 'rxjs';
+import { TTeammate } from '@models/survey.model';
+
 
 @Component({
     selector: 'app-question-card-team-assert-checkbox',
@@ -23,6 +27,8 @@ export class QuestionCardTeamAssertCheckboxComponent implements QuestionComponen
     filteredTeam = new BehaviorSubject<TTeammate[]>([]);
 
     selectionModel = new SelectionModel<TTeammate>(true, [],)
+
+    constructor(private store: Store) {}
 
     ngOnInit(): void {
 

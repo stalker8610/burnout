@@ -97,12 +97,6 @@ const checkPasswords: ValidatorFn = (group: AbstractControl): ValidationErrors |
 
 class MyErrorStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: NgForm | null): boolean {
-        /* const invalidCtrl = !!(control?.invalid && control?.parent?.dirty);
-        const invalidParent = !!(control?.parent?.invalid && control?.parent?.dirty);
-        console.log(control);
-        console.log(form); */
-        /* return invalidCtrl || invalidParent; */
-        /* console.log(form); */
         return !!(form?.invalid && form.dirty && form.form.controls['passwordConfirm']!.touched);
     }
 }

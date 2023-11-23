@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TTeammate } from '../../services/data.service';
 import { FormControl } from '@angular/forms';
 import { debounce, startWith, timer, Subject } from 'rxjs';
 import { QuestionComponent } from '../question.interface';
@@ -7,6 +6,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { TeamAssertBooleanQuestionInputData } from 'src/app/survey/survey.component';
 import { TAnswerTeamAssertBoolean } from '@models/survey.model';
+import { TTeammate } from '@models/survey.model';
 
 @Component({
     selector: 'app-question-card-team-assert-boolean',

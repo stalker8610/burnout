@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getAuthorizedUserData } from 'src/app/store/data/data.selectors';
+import { getAuthorizedUser } from 'src/app/store/auth/auth.selectors';
 import { map, filter } from 'rxjs';
+import { concatRespondentName } from 'src/app/store/data/data.util';
 
 @Component({
     selector: 'app-login-status',
@@ -10,10 +11,10 @@ import { map, filter } from 'rxjs';
 })
 export class LoginStatusComponent {
 
-    userAuthorized = this.store.select(getAuthorizedUserData);
+    userAuthorized = this.store.select(getAuthorizedUser);
     userName = this.userAuthorized.pipe(
-        filter(value => !!value),
-        map(user => `${user?.lastName || ''} ${user?.firstName || ''} ${user?.middleName || ''}`.trim())
+        filter(value => !!value?.respondent),
+        map(user => concatRespondentName(user?.respondent!))
     )
 
     constructor(private store: Store) { }

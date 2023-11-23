@@ -1,54 +1,68 @@
 <mat-tree [dataSource]="dataSource" [trackBy]="trackByFn" [treeControl]="treeControl">
-    <!-- This is the tree node template for leaf nodes -->
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-        <!-- use a disabled button to provide padding for tree leaf -->
-        <button *ngIf="!node.expandable; else expandable" mat-icon-button disabled></button>
-        <ng-template #expandable>
-            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
+        <div *ngIf="node.type === ENodeTypes.Respondent; else department">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Respondent menu" [disabled]="isDisabled(node)">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="edit(node)">
+                    <mat-icon>edit</mat-icon>
+                    <span>Редактировать</span>
+                </button>
+                <button mat-menu-item [disabled]="!invitable(node)">
+                    <mat-icon>email</mat-icon>
+                    <span>Отправить приглашение</span>
+                </button>
+                <button mat-menu-item (click)="remove(node)" [disabled]="!removable(node)">
+                    <mat-icon>close</mat-icon>
+                    <span>Удалить</span>
+                </button>
+            </mat-menu>
+        </div>
+
+
+        <ng-template #department>
+            <!-- use a disabled button to provide padding for tree leaf -->
+            <button *ngIf="node.expandable; else notExpandable" mat-icon-button matTreeNodeToggle
+                [attr.aria-label]="'Toggle ' + node.title">
                 <mat-icon class="mat-icon-rtl-mirror">
                     {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
                 </mat-icon>
             </button>
+            <ng-template #notExpandable>
+                <button mat-icon-button disabled></button>
+            </ng-template>
         </ng-template>
 
         <div [class]="getNodeClass(node)">
-            <div *ngIf="editNode?._id === node._id; else viewMode">
+            <!-- <div *ngIf="editNode?._id === node._id; else viewMode">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <!-- <input matInput type="text" [formControl]="editNodeControl" (blur)="confirmEdit()" (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()"> -->
-                    <input matInput appFocusable type="text" [formControl]="editNodeControl" (blur)="confirmEdit()" (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()">
+                    <input matInput appFocusable type="text" [formControl]="editNodeControl" (blur)="confirmEdit()"
+                        (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()">
                 </mat-form-field>
             </div>
-            <ng-template #viewMode>{{nodeTitle(node)}}
-                <div class="command-bar" [class.invisible]="editNode?._id">
-                    <button mat-icon-button (click)="edit(node)" color="accent">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="remove(node)" color="accent" [disabled]="node.expandable">
-                        <mat-icon>close</mat-icon>
-                    </button>
+            <ng-template #viewMode>
+                <div *ngIf="node.type === ENodeTypes.Respondent" class="respondent-view">
+                    <div>{{node.title}}</div>
+                    <div class="email">{{node.email}}</div>
+                    <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
+                    </div>
                 </div>
-            </ng-template>
+                <div *ngIf="node.type === ENodeTypes.Department" matTreeNodeToggle>
+                    {{nodeTitle(node)}}
+                </div>
+            </ng-template> -->
+            <div *ngIf="node.type === ENodeTypes.Respondent" class="respondent-view">
+                <div>{{node.title}}</div>
+                <div class="email">{{node.email}}</div>
+                <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
+                </div>
+            </div>
+            <div *ngIf="node.type === ENodeTypes.Department" matTreeNodeToggle>
+                {{nodeTitle(node)}}
+            </div>
         </div>
 
     </mat-tree-node>
-    <!-- This is the tree node template for expandable nodes -->
-    <!-- <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
-        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.title">
-            <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-        </button>
-        <div [class]="getNodeClass(node)">
-            {{nodeTitle(node)}}
-            <div class="command-bar" [class.invisible]="editNodeId">
-                <button mat-icon-button (click)="edit(node)" color="accent">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="remove(node)" color="accent">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </div>
-        </div>
 
-    </mat-tree-node> -->
 </mat-tree>

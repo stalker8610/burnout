@@ -4,13 +4,13 @@ import * as AuthActions from "./auth.actions";
 import { TLoginResult } from '../../services/auth.service';
 
 export interface IState {
-    done: boolean,
+    getMeRequestDone: boolean,
     authorizedUser: TLoginResult | null,
     error: string | null
 }
 
 const initialState: IState = {
-    done: false,
+    getMeRequestDone: false,
     authorizedUser: null,
     error: null
 }
@@ -19,23 +19,26 @@ export const authReducer = createReducer(
     initialState,
     on(AuthActions.getAuthStatusSuccessful, state => ({
         ...state,
-        done: true
+        getMeRequestDone: true
     })),
-    on(AuthActions.loginFailed, (state, { error }) => ({
+    on(AuthActions.loginFailed, (state, { message }) => ({
         ...state,
-        error,
+        error: message,
     })),
-    on(AuthActions.loginSuccessful, (state, authorizedUser) => ({
+    on(AuthActions.loginSuccessful, (state) => ({
         ...state,
-        done: true,
-        authorizedUser
+        getMeRequestDone: false
+    })),
+    on(AuthActions.getAuthStatusSuccessful, (state, { user }) => ({
+        ...state,
+        getMeRequestDone: true,
+        authorizedUser: user
     })),
     on(AuthActions.logoutSuccessful, () => ({
-        ...initialState,
-        done: true,
+        ...initialState
     })),
-    on(AuthActions.logoutFailed, (state, { error }) => ({
+    on(AuthActions.logoutFailed, (state, { message }) => ({
         ...state,
-        error,
+        error: message,
     }))
 )        

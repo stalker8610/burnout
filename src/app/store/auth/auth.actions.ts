@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { TLoginResult } from "src/app/services/auth.service";
+import { IWithMessage } from "@models/common.model";
 
 enum EAuthActions {
     AppStarted = '[App] App Started',
@@ -30,7 +31,7 @@ export const getAuthStatusSuccessful = createAction(
 
 export const getAuthStatusFailed = createAction(
     EAuthActions.GetAuthStatusFailed,
-    props<{ error: string }>()
+    props<IWithMessage>()
 )
 
 export const authStatusRequested = createAction(
@@ -39,24 +40,26 @@ export const authStatusRequested = createAction(
 
 export const login = createAction(
     EAuthActions.Login,
-    props<{ email: string, password: string }>())
+    props<{ email: string, password: string }>()
+)
 
 export const loginFailed = createAction(
     EAuthActions.LoginFailed,
-    props<{ error: string }>())
+    props<IWithMessage>())
 
 export const loginSuccessful = createAction(
-    EAuthActions.LoginSuccessful,
-    props<TLoginResult & { navigate: boolean }>());
+    EAuthActions.LoginSuccessful
+);
 
 export const logout = createAction(
-    EAuthActions.Logout);
+    EAuthActions.Logout
+);
 
 export const logoutFailed = createAction(
     EAuthActions.LogoutFailed,
-    props<{ error: string }>())
+    props<IWithMessage>()
+)
 
 export const logoutSuccessful = createAction(
-    EAuthActions.LogoutSuccessful,
-    props<{ navigate: boolean }>()
+    EAuthActions.LogoutSuccessful
 );
