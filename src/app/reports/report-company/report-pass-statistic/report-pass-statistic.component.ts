@@ -1,15 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Chart, ChartConfiguration, ChartEvent, ChartType, Colors } from 'chart.js';
+import { ChartConfiguration } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { Store } from '@ngrx/store';
-import { getReportData } from 'src/app/store/reports/report-pass-statistic/report-pass-statistic.selectors';
-import { concatLatestFrom } from '@ngrx/effects';
-/* import Annotation from 'chartjs-plugin-annotation'; */
-import { getDepartments } from 'src/app/store/data/data.selectors';
+import { actions, selectors } from 'src/app/store/reports/report-pass-statistic.store';
 import { loadRequested } from 'src/app/store/data/data.actions';
 import { getAuthorizedUser } from 'src/app/store/auth/auth.selectors';
-import { filter, take, map } from 'rxjs'
-import { reportRequested } from 'src/app/store/reports/report-pass-statistic/report-pass-statistic.actions';
+import { filter, take } from 'rxjs'
+import { colorDataset, datasetColorOptions } from '../../reports.util';
+
 
 @Component({
     selector: 'app-report-pass-statistic',
@@ -19,8 +17,6 @@ import { reportRequested } from 'src/app/store/reports/report-pass-statistic/rep
 export class ReportPassStatisticComponent implements OnInit {
 
     @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-
-    public lineChartType: ChartType = 'line';
 
     public lineChartData: ChartConfiguration['data'] = {
         datasets: [],
@@ -38,30 +34,50 @@ export class ReportPassStatisticComponent implements OnInit {
                 position: 'left',
                 min: 0,
                 /* max: 100 */
+                ticks: {
+                    callback: function (value) {
+                        return `${value}%`;
+                    }
+                }
             }
         },
-
+        layout: {
+            padding: {
+                right: 50
+            }
+        },
         plugins: {
-            /* legend: { display: false }, */
-            /* tooltip: { enabled: false }, */
+            legend: {
+                labels: {
+                    font: {
+                        size: 14,
+                        family: 'Roboto'
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => {
+                        let label = context.dataset.label || '';
+
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += `${context.parsed.y}%`;
+                        }
+                        return label;
+                    }
+                }
+            },
         },
     };
 
-    data = this.store.select(getReportData).pipe(
-        filter(data => !!data),
-        /* concatLatestFrom(() => this.store.select(getDepartments)),
-        map(([data, departments]) => ({
-            ...data,
-            records: data!.records.map(record => ({
-                ...record,
-                department: departments!.find(department => department._id === record.departmentId)
-            }))
-        })) */
+    data = this.store.select(selectors.getReportData).pipe(
+        filter(data => !!data)
     )
 
-    constructor(private readonly store: Store) {
-        Chart.register(/* Annotation, */ Colors);
-    }
+    constructor(private readonly store: Store) { }
 
     ngOnInit(): void {
         this.store.dispatch(loadRequested());
@@ -71,12 +87,10 @@ export class ReportPassStatisticComponent implements OnInit {
                 filter(value => !!value),
                 take(1))
             .subscribe(user =>
-                this.store.dispatch(reportRequested({ companyId: user!.companyId })))
+                this.store.dispatch(actions.reportRequested({ query: { companyId: user!.companyId } })))
 
         this.data.subscribe(
             data => {
-
-                console.log(data);
 
                 const labels = data!.periods!.map(value => new Date(value).toLocaleDateString('ru'));
 
@@ -87,7 +101,7 @@ export class ReportPassStatisticComponent implements OnInit {
                         .reduce((acc, cur) => acc + (cur.generated ?? 0), 0)
                 }))
 
-                console.log('generated', generatedByCompany);
+                /* console.log('generated', generatedByCompany); */
 
                 const takenByCompany = data!.periods!.map(period => ({
                     period,
@@ -96,7 +110,7 @@ export class ReportPassStatisticComponent implements OnInit {
                         .reduce((acc, cur) => acc + (cur.taken ?? 0), 0)
                 }))
 
-                console.log('taken', takenByCompany);
+                /* console.log('taken', takenByCompany); */
 
                 const givenAnswersByCompany = data!.periods!.map(period => ({
                     period,
@@ -105,13 +119,13 @@ export class ReportPassStatisticComponent implements OnInit {
                         .reduce((acc, cur) => acc + (cur.givenAnswers ?? 0), 0)
                 }))
 
-                console.log('given', givenAnswersByCompany);
+                /* console.log('given', givenAnswersByCompany); */
 
                 const generatedToTakenDataset = data!.periods!.map(value => {
                     const generated = generatedByCompany.find(element => element.period === value)?.value || 0;
                     const taken = takenByCompany.find(element => element.period === value)?.value || 0;
 
-                    return generated ? taken / generated * 100 : 0
+                    return generated ? Math.round(taken / generated * 100) : 0
                 });
 
                 const givenAnswersToTakenDataset = data!.periods!.map(value => {
@@ -120,7 +134,7 @@ export class ReportPassStatisticComponent implements OnInit {
 
                     const answersInSurvey = 10;
 
-                    return taken ? givenAnswers / (taken * answersInSurvey) * 100 : 0
+                    return taken ? Math.round(givenAnswers / (taken * answersInSurvey) * 100) : 0
                 });
 
                 this.lineChartData = {
@@ -128,24 +142,13 @@ export class ReportPassStatisticComponent implements OnInit {
                     datasets: [
                         {
                             data: generatedToTakenDataset,
-                            label: 'Процент участия',
-                            /* backgroundColor: 'rgba(148,159,177,0.2)',
-                            borderColor: 'rgba(148,159,177,1)',
-                            pointBackgroundColor: 'rgba(148,159,177,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(148,159,177,0.8)' */
+                            label: ' Процент участия',
+                            ...datasetColorOptions(colorDataset.pink)
                         },
                         {
                             data: givenAnswersToTakenDataset,
-                            label: 'Процент ответов',
-                            /* backgroundColor: 'rgba(77,83,96,0.2)',
-                            borderColor: 'rgba(77,83,96,1)',
-                            pointBackgroundColor: 'rgba(77,83,96,1)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(77,83,96,1)', */
-                            
+                            label: ' Процент ответов',
+                            ...datasetColorOptions(colorDataset.indigo)
                         }
                     ],
                     labels

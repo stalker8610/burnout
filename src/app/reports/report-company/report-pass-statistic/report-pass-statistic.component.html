@@ -1,6 +1,11 @@
-<div class="container">
-    <mat-label>Отчет о прохождении опросов</mat-label>
-    <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions" [type]="lineChartType">
-        <p>Ваш браузер не поддерживает работу с графикой</p>
-    </canvas>
+<div class="caption">Отчет о прохождении опросов</div>
+<div class="chart-container">
+    <ng-container *ngIf="data | async; else noDataProvided">
+        <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions" [type]="'line'">
+            <p>Ваш браузер не поддерживает работу с графикой</p>
+        </canvas>
+    </ng-container>
+    <ng-template #noDataProvided>
+        Недостаточно данных для отображения
+    </ng-template>
 </div>

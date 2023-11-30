@@ -1,6 +1,7 @@
 import { IRespondent } from "@models/respondent.model";
 import { Scopes } from "@models/user.model";
 import { SignUpStatus } from "@models/respondent.model";
+import { PersonalFeedbackMood } from "@models/survey.model";
 
 export const concatRespondentName = (respondent: IRespondent ) => {
     return `${respondent.lastName || ''} ${respondent.firstName || ''} ${respondent.middleName || ''}`.trim();
@@ -45,4 +46,17 @@ export function getSignUpStatusView(status: SignUpStatus) {
         case SignUpStatus.SingedUp: return 'Зарегистрирован(-a)';
         case SignUpStatus.Disabled: return 'Учетная запись отключена';
     }
+}
+
+export function getPersonalFeedbackView(rate: PersonalFeedbackMood) {
+
+    switch (rate){
+        case PersonalFeedbackMood.Angry: return 'Сильно не соответствует ожиданиям';
+        case PersonalFeedbackMood.Sad: return 'Не соответствует ожиданиям';
+        case PersonalFeedbackMood.Happy: return 'Соответствует ожиданиям';
+        case PersonalFeedbackMood.Happier: return 'Превосходит ожидания';
+        case PersonalFeedbackMood.Happiest: return 'Сильно превосходит ожидания';
+        default: throw 'Unknown personal feedback rate';
+    }
+
 }

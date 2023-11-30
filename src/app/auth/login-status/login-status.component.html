@@ -1,6 +1,6 @@
 <ng-container *ngIf="userAuthorized | async as userAuthorized; else loginBlock">
     <div>
-        <span>
+        <span class="unselectable">
             {{userName | async}}
         </span>
         <a mat-button href="/logout">

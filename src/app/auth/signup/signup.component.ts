@@ -1,8 +1,10 @@
 import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, ValidationErrors, NgForm } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Component, Input, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { Subject } from 'rxjs';
+import { take, filter, BehaviorSubject } from 'rxjs';
+import { signup, validateToken } from 'src/app/store/auth/auth.actions';
+import { Store } from '@ngrx/store';
+import { getSignupError, isSignUpSuccessful, isSignupTokenValid } from 'src/app/store/auth/auth.selectors';
 
 @Component({
     selector: 'app-signup',
@@ -14,38 +16,58 @@ export class SignupComponent implements OnInit {
     @Input() token: string = '';
 
     hide = true;
-    signUpStatus = false;
-    signUpError = new Subject<string>();
-    loading = false;
+    isSignupTokenValid = this.store.select(isSignupTokenValid)
+    isSignUpSuccessful = this.store.select(isSignUpSuccessful)
+    signUpError = this.store.select(getSignupError)
+    inProcess = new BehaviorSubject<boolean>(false);
+
 
     passwordGroup = new FormGroup({
-        password: new FormControl('', { validators: [Validators.required, Validators.minLength(8)] }),
-        passwordConfirm: new FormControl('')
+        password: new FormControl('', { validators: [Validators.required, Validators.minLength(4)] }),
+        passwordConfirm: new FormControl(''),
     }, { validators: [checkPasswords] });
 
     errorMatcher = new MyErrorStateMatcher();
 
-    constructor(private readonly authService: AuthService) { }
-
-    ngOnInit(): void {
-        this.loading = true;
-        this.passwordGroup.disable();
-        this.authService.validateToken(this.token).subscribe({
-            next: () => { 
-                this.loading = false;
+    constructor(private readonly store: Store) {
+        this.inProcess.subscribe(value => {
+            if (value) {
+                this.passwordGroup.disable();
+            } else {
                 this.passwordGroup.enable();
-            },
-            error: (error) => { 
-                this.signUpError.next(error.message);
             }
         })
+    }
+
+    ngOnInit(): void {
+        this.inProcess.next(true);
+
+        this.store.dispatch(validateToken({ token: this.token }));
+        this.store.select(isSignupTokenValid)
+            .pipe(
+                filter(value => !!value),
+                take(1)
+            )
+            .subscribe(() => this.inProcess.next(false))
+    }
+
+    signUp() {
+        this.inProcess.next(true);
+        const password = this.passwordGroup.controls.password.value!;
+        this.store.dispatch(signup({ token: this.token, password }));
+        this.store.select(isSignUpSuccessful)
+            .pipe(
+                filter(value => !value),
+                take(1)
+            )
+            .subscribe(() => this.inProcess.next(false))
     }
 
     getPasswordErrorMessage(): string {
         if (this.passwordGroup.hasError('required', 'password')) {
             return 'Введите пароль';
         } else if (this.passwordGroup.hasError('minlength', 'password')) {
-            return 'Укажите не менее 8 символов';
+            return 'Укажите не менее 4-x символов';
         }
 
         return '';
@@ -63,26 +85,8 @@ export class SignupComponent implements OnInit {
         return this.passwordGroup.hasError('notMatches');
     }
 
-    signUp() {
-
-        this.loading = true;
-        this.signUpError.next('');
-        this.passwordGroup.disable();
-
-        this.authService.signUp(this.token,
-            this.passwordGroup.controls['password']!.value!).
-            subscribe({
-                next: () => this.signUpStatus = true,
-                error: (error) => {
-                    this.signUpError.next(error.message);
-                    this.passwordGroup.enable();
-                    this.loading = false;
-                }
-            });
-    }
-
     changePasswordVisibility() {
-        if (!this.loading) {
+        if (!this.inProcess.getValue()) {
             this.hide = !this.hide;
         }
     }

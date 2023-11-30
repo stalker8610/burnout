@@ -1,11 +1,10 @@
-import { filter, take, map } from 'rxjs';
+import { filter, take, map, combineLatest } from 'rxjs';
 import { getAuthorizedUser } from './../../store/auth/auth.selectors';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getReportData } from 'src/app/store/reports/report-wall/report-wall.selectors';
+import { actions, selectors as reportSelectors } from 'src/app/store/reports/report-wall.store';
+import * as dataSelectors from 'src/app/store/data/data.selectors';
 import { SelfMood } from '@models/survey.model';
-import { reportRequested } from 'src/app/store/reports/report-wall/report-wall.actions';
-import { concatLatestFrom } from '@ngrx/effects';
 import { getTeam } from 'src/app/store/data/data.selectors';
 import { concatRespondentName } from 'src/app/store/data/data.util';
 import { loadRequested } from 'src/app/store/data/data.actions';
@@ -18,22 +17,30 @@ import { loadRequested } from 'src/app/store/data/data.actions';
 export class ReportWallComponent implements OnInit {
 
     SelfMood = SelfMood;
-    records = this.store.select(getReportData).pipe(
-        concatLatestFrom(() => this.store.select(getTeam(true))),
-        filter(([records, team]) => !!records && !!team),
-        map(([records, team]) =>
-            records!.map(record => {
-                let respondent = '';
-                if (record.respondentId) {
-                    respondent = concatRespondentName(team!.find(teammate => teammate._id === record!.respondentId)!)
-                }
-                return {
-                    ...record,
-                    respondent
+    loaded = combineLatest([
+        this.store.select(reportSelectors.getLoaded),
+        this.store.select(dataSelectors.getLoaded)])
+        .pipe(
+            map(([reportLoaded, dataLoaded]) => reportLoaded && dataLoaded)
+        )
 
-                }
-            }))
-    );
+    records = combineLatest([
+        this.store.select(reportSelectors.getReportData),
+        this.store.select(getTeam(true))])
+        .pipe(
+            filter(([data, team]) => !!data && !!team),
+            map(([data, team]) =>
+                data!.records.map(record => {
+                    let respondent = '';
+                    if (record.respondentId) {
+                        respondent = concatRespondentName(team!.find(teammate => teammate._id === record!.respondentId)!)
+                    }
+                    return {
+                        ...record,
+                        respondent
+                    }
+                }))
+        );
 
     images: Record<SelfMood, string> = {
         [SelfMood.Sad]: '/assets/images/wall/sad-mood.png',
@@ -44,15 +51,15 @@ export class ReportWallComponent implements OnInit {
     constructor(private store: Store) { }
 
     ngOnInit(): void {
-        
+
         this.store.dispatch(loadRequested());
-        
+
         this.store.select(getAuthorizedUser)
             .pipe(
                 filter(value => !!value),
                 take(1))
             .subscribe(user =>
-                this.store.dispatch(reportRequested({ companyId: user!.companyId })))
+                this.store.dispatch(actions.reportRequested({ query: { companyId: user!.companyId } })))
     }
 
     getDateView(date: string) {

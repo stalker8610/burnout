@@ -1,7 +1,9 @@
+<div class="caption">Структура компании</div>
 <mat-tree [dataSource]="dataSource" [trackBy]="trackByFn" [treeControl]="treeControl">
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
         <div *ngIf="node.type === ENodeTypes.Respondent; else department">
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Respondent menu" [disabled]="isDisabled(node)">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Respondent menu"
+                [disabled]="isDisabled(node)">
                 <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
@@ -9,7 +11,7 @@
                     <mat-icon>edit</mat-icon>
                     <span>Редактировать</span>
                 </button>
-                <button mat-menu-item [disabled]="!invitable(node)">
+                <button mat-menu-item (click)="invite(node)" [disabled]="!invitable(node)">
                     <mat-icon>email</mat-icon>
                     <span>Отправить приглашение</span>
                 </button>
@@ -53,14 +55,15 @@
                 </div>
             </ng-template> -->
             <div *ngIf="node.type === ENodeTypes.Respondent" class="respondent-view">
-                <div>{{node.title}}</div>
+                <div (click)="edit(node)">{{node.title}}</div>
                 <div class="email">{{node.email}}</div>
                 <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
                 </div>
             </div>
-            <div *ngIf="node.type === ENodeTypes.Department" matTreeNodeToggle>
+            <div *ngIf="node.type === ENodeTypes.Department" (click)="edit(node)">
                 {{nodeTitle(node)}}
             </div>
+            <!-- matTreeNodeToggle -->
         </div>
 
     </mat-tree-node>

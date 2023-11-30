@@ -6,7 +6,6 @@ export class AbstractHttpService {
     constructor(protected readonly httpClient: HttpClient) { }
 
     private handleError(error: HttpErrorResponse) {
-        console.log(error);
         return throwError(() => new Error(error.error));
     }
 

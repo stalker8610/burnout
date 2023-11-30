@@ -1,3 +1,11 @@
+@use '@angular/material' as mat;
+@import 'src/vars.scss';
+@import 'src/common.scss';
+
+mat-tree {
+    margin: 20px 0;
+}
+
 .node {
     /* display: flex; */
     align-items: center;
@@ -14,7 +22,8 @@
 }
 
 .department {
-    font-size: 18px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .respondent {
@@ -27,9 +36,10 @@
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     max-width: 600px;
-    /* mat-icon {
-        padding: 10px;
-    } */
+    div:first-of-type {
+        cursor: pointer;
+        
+    }
 }
 
 .disabled-respondent {
@@ -37,15 +47,15 @@
 }
 
 .signedUp {
-    color: green;
+    color: mat.get-color-from-palette(mat.$green-palette, 500);
 }
 
 .invited {
-    color: yellow;
+    color: mat.get-color-from-palette(mat.$indigo-palette, 500);
 }
 
 .notInvitedYet {
-    color: red;
+    color: mat.get-color-from-palette($warn-palette, 500);
 }
 
 

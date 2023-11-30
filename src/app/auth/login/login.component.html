@@ -9,9 +9,9 @@
     </mat-form-field>
     <button mat-stroked-button (click)="auth()" type="button" [disabled]="email.invalid || password.invalid"
         color="primary">Войти</button>
-    <div class="message-container">
+    <!-- <div class="message-container">
         <div *ngIf="error$ | async as error" class="error">
             {{error}}
         </div>
-    </div>
+    </div> -->
 </form>

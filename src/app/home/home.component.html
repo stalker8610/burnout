@@ -1,4 +1,4 @@
-<mat-nav-list class="menu">
+<mat-nav-list>
     <ng-container *ngIf="(hasScope(Scopes.HR) | async) || (hasScope(Scopes.Admin) | async)">
         <mat-list-item routerLink="wall" routerLinkActive="active-link" ariaCurrentWhenActive="page">
             Лента
@@ -17,7 +17,6 @@
         Мой опрос
     </mat-list-item>
 </mat-nav-list>
-
 <div class="content">
     <router-outlet></router-outlet>
 </div>

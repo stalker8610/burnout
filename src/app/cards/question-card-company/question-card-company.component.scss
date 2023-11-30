@@ -1,5 +1,9 @@
+@use '@angular/material' as mat;
+@import 'src/common.scss';
+@import 'src/vars.scss';
+
 $circle-radius: 20px;
-$border-color: #5C6BC0;
+$color: mat.get-color-from-palette($primary-palette, 400);
 
 .scores {
     display: flex;
@@ -14,7 +18,7 @@ $border-color: #5C6BC0;
     width: calc(2 * $circle-radius);
     height: calc(2 * $circle-radius);
     border-radius: $circle-radius;
-    border: 3px solid $border-color;
+    border: 3px solid $color;
     font-size: 12px;
     flex-shrink: 0;
     flex-grow: 0;
@@ -24,7 +28,7 @@ $border-color: #5C6BC0;
 .edge {
     height: $circle-radius;
     box-sizing: border-box;
-    border-bottom: 3px solid $border-color;
+    border-bottom: 3px solid $color;
     flex-grow: 1;
 }
 

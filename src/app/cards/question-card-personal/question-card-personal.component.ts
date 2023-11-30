@@ -5,6 +5,7 @@ import { trigger, transition, animate, style, state } from '@angular/animations'
 import { BehaviorSubject } from 'rxjs';
 import { TeammateFeedbackQuestionInputData } from 'src/app/survey/survey.component';
 import { PersonalFeedbackMood, TAnswerPersonal } from '@models/survey.model';
+import { getPersonalFeedbackView } from 'src/app/store/data/data.util';
 
 @Component({
     selector: 'app-question-card-personal',
@@ -38,31 +39,32 @@ export class QuestionCardPersonalComponent implements QuestionComponent, OnInit 
         {
             mood: PersonalFeedbackMood.Angry,
             imgSrc: '/assets/images/team/angry.png',
-            label: 'Сильно не соответствует ожиданиям'
+            label: getPersonalFeedbackView(PersonalFeedbackMood.Angry)
         },
         {
             mood: PersonalFeedbackMood.Sad,
             imgSrc: '/assets/images/team/sad.png',
-            label: 'Не соответствует ожиданиям'
+            label: getPersonalFeedbackView(PersonalFeedbackMood.Sad)
         },
         {
             mood: PersonalFeedbackMood.Happy,
             imgSrc: '/assets/images/team/happy.png',
-            label: 'Соответствует ожиданиям'
+            label: getPersonalFeedbackView(PersonalFeedbackMood.Happy)
         },
         {
             mood: PersonalFeedbackMood.Happier,
             imgSrc: '/assets/images/team/happy-2.png',
-            label: 'Превосходит ожидания'
+            label: getPersonalFeedbackView(PersonalFeedbackMood.Happier)
         },
         {
             mood: PersonalFeedbackMood.Happiest,
             imgSrc: '/assets/images/team/happy-3.png',
-            label: 'Сильно превосходит ожидания'
+            label: getPersonalFeedbackView(PersonalFeedbackMood.Happiest)
         },
     ]
 
     selectionModel = new SelectionModel<PersonalFeedbackMood>(false)
+    //selectionModel = new SelectionModel<PersonalFeedbackMood>(false, [PersonalFeedbackMood.Happy])
 
     text = '';
 
@@ -77,14 +79,17 @@ export class QuestionCardPersonalComponent implements QuestionComponent, OnInit 
     }
 
     confirmAnswer(): TAnswerPersonal {
-
         let result: TAnswerPersonal;
         if (this.newcomer) {
             result = {
+                feedbackTo: this.inputData.teammate._id,
                 newcomer: true
             }
         } else {
-            result = {};
+            result = {
+                feedbackTo: this.inputData.teammate._id,
+                //mood: this.selectionModel.selected[0]
+            };
             if (this.text.trim().length) {
                 result.text = this.text.trim();
             }

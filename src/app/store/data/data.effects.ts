@@ -4,7 +4,7 @@ import { DataService } from "../../services/data.service"
 import { Actions, ofType } from "@ngrx/effects"
 import * as DataActions from './data.actions'
 import * as AuthActions from '../auth/auth.actions'
-import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
+import { map, catchError, exhaustMap, of, filter} from "rxjs"
 import { inject } from '@angular/core'
 import { IDepartment } from "@models/department.model"
 import { TWithId } from "@models/common.model"
@@ -14,7 +14,6 @@ import { Store } from "@ngrx/store"
 import { getCompanyId, getLoaded, getRespondent } from './data.selectors'
 import { concatLatestFrom } from "@ngrx/effects"
 import { Scopes } from "@models/user.model"
-import { MatSnackBar } from "@angular/material/snack-bar"
 import { TCompanyStructure } from "@models/company.model"
 import { handleError } from "../error.handler"
 
@@ -215,64 +214,6 @@ export const patchDepartment$ = createEffect(
         ),
     { functional: true }
 )
-
-export const errorOccured$ = createEffect(
-    (actions$ = inject(Actions)) => {
-
-        const snackBar = inject(MatSnackBar);
-
-        return actions$.pipe(
-            ofType(
-                DataActions.addDepartmentFailed,
-                DataActions.addRespondentFailed,
-                DataActions.loadFailed,
-                DataActions.patchDepartmentFailed,
-                DataActions.patchRespondentFailed,
-                DataActions.removeDepartmentFailed,
-                DataActions.removeRespondentFailed,
-            ),
-            tap(action => {
-                snackBar.open(action.message, 'Закрыть', {
-                    duration: 3000
-                });
-            })
-        )
-    },
-    {
-        functional: true,
-        dispatch: false
-    }
-)
-
-
-export const doneSuccessful$ = createEffect(
-    (actions$ = inject(Actions)) => {
-
-        const snackBar = inject(MatSnackBar);
-
-        return actions$.pipe(
-            ofType(
-                DataActions.addDepartmentSuccessful,
-                DataActions.addRespondentSuccessful,
-                DataActions.patchDepartmentSuccessful,
-                DataActions.patchRespondentSuccessful,
-                DataActions.removeDepartmentSuccessful,
-                DataActions.removeRespondentSuccessful,
-                DataActions.deactivateRespondentSuccessful
-            ),
-            tap(action => {
-                snackBar.open(action.message, 'Закрыть', {
-                    duration: 3000
-                });
-            })
-        )
-    },
-    {
-        functional: true,
-        dispatch: false
-    }
-)
-
 
 
 

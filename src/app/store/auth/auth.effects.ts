@@ -5,10 +5,13 @@ import * as AuthActions from './auth.actions'
 import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core';
 import { Router } from "@angular/router"
-import { requestDone } from "./auth.selectors"
+import { getAuthorizedUser, requestDone } from "./auth.selectors"
 import { Store } from "@ngrx/store"
 import { concatLatestFrom } from "@ngrx/effects"
-import { MatSnackBar } from "@angular/material/snack-bar"
+
+import { ISignupToken } from "@models/token.model"
+import { getRespondent } from "../data/data.selectors"
+import { handleError } from "../error.handler"
 
 export const authStatusRequested$ = createEffect((actions$ = inject(Actions), store = inject(Store)) =>
     actions$.pipe(
@@ -26,15 +29,7 @@ export const getAuthStatus$ = createEffect((actions$ = inject(Actions), authServ
         exhaustMap(() => authService.getMe()
             .pipe(
                 map((authorizedUser: TLoginResult | null) => AuthActions.getAuthStatusSuccessful({ user: authorizedUser })),
-                catchError((error: { message: string, status: number }) => {
-                    let message = error.message;
-                    if (error.status === 504) {
-                        message = 'Сервер недоступен. Попробуйте позже';
-                    } else if (error.status === 500) {
-                        message = 'Произошла ошибка на сервере. Попробуйте позже'
-                    }
-                    return of(AuthActions.getAuthStatusFailed({ message }))
-                })
+                catchError(handleError(AuthActions.getAuthStatusFailed))
             )
         )
     ),
@@ -45,7 +40,7 @@ export const getAuthStatusSuccessfulRedirect$ = createEffect((actions$ = inject(
     actions$.pipe(
         ofType(AuthActions.getAuthStatusSuccessful),
         filter(data => !data.user),
-        tap(() => router.navigate(['/login']))
+        //tap(() => router.navigate(['/login']))
     ),
     {
         functional: true,
@@ -61,16 +56,7 @@ export const login$ = createEffect(
             exhaustMap(({ email, password }) => authService.logIn(email, password)
                 .pipe(
                     map(() => AuthActions.loginSuccessful()),
-                    catchError((error: { status: number }) => {
-                        console.log(error);
-                        let message = 'Неправильный логин или пароль';
-                        if (error.status === 504) {
-                            message = 'Сервер недоступен. Попробуйте позже';
-                        } else if (error.status === 500) {
-                            message = 'Произошла ошибка на сервере. Обратитесь в техподдержку'
-                        }
-                        return of(AuthActions.loginFailed({ message }))
-                    })
+                    catchError(handleError(AuthActions.loginFailed, 'Неправильный логин или пароль'))
                 )
             )
         ),
@@ -92,11 +78,10 @@ export const loginSuccessfulRedirect$ = createEffect(
 export const logout$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService)) =>
     actions$.pipe(
         ofType(AuthActions.logout),
-        tap(() => console.log('logout')),
         exhaustMap(() => authService.logOut()
             .pipe(
                 map(() => AuthActions.logoutSuccessful()),
-                catchError((error: { message: string }) => of(AuthActions.logoutFailed({ message: error.message })))
+                catchError(handleError(AuthActions.logoutFailed))
             )
         )
     ),
@@ -115,24 +100,63 @@ export const logoutSuccessfulRedirect$ = createEffect(
     }
 )
 
-export const errorOccured$ = createEffect(
-    (actions$ = inject(Actions)) => {
+export const invite$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService), store = inject(Store)) =>
+    actions$.pipe(
+        ofType(AuthActions.invite),
+        concatLatestFrom(
+            (action) => [
+                store.select(getAuthorizedUser),
+                store.select(getRespondent(action.respondentId))
+            ]),
+        filter(([action, user, respondent]) => !!user && !!respondent),
+        exhaustMap(([action, user, respondent]) => {
 
-        const snackBar = inject(MatSnackBar);
+            const tokenData: ISignupToken = {
+                respondentId: respondent._id,
+                scope: respondent.scope
+            }
 
-        return actions$.pipe(
-            ofType(
-                AuthActions.getAuthStatusFailed,
-                AuthActions.logoutFailed
-            ),
-            tap(action => {
-                if (action.message)
-                    snackBar.open(action.message, 'Закрыть', {
-                        duration: 3000
-                    });
-            })
-        )
-    },
+            return authService.invite(tokenData, user!.respondentId)
+                .pipe(
+                    map(() => AuthActions.inviteSuccessful({ message: 'Приглашение отправлено' })),
+                    catchError(handleError(AuthActions.inviteFailed))
+                )
+        })
+    ),
+    { functional: true }
+)
+
+export const signup$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService)) =>
+    actions$.pipe(
+        ofType(AuthActions.signup),
+        exhaustMap((action => authService.signUp(action.token, action.password)
+            .pipe(
+                map(() => AuthActions.signupSuccessful({ message: 'Учетная запись активирована' })),
+                catchError(handleError(AuthActions.signupFailed))
+            )
+        ))
+    ),
+    { functional: true }
+)
+
+export const validateToken$ = createEffect((actions$ = inject(Actions), authService = inject(AuthService)) =>
+    actions$.pipe(
+        ofType(AuthActions.validateToken),
+        exhaustMap((action => authService.validateToken(action.token)
+            .pipe(
+                map(() => AuthActions.validateTokenSuccessful()),
+                catchError(handleError(AuthActions.validateTokenFailed))
+            )
+        ))
+    ),
+    { functional: true }
+)
+
+export const signupSuccessful$ = createEffect((actions$ = inject(Actions), router = inject(Router)) =>
+    actions$.pipe(
+        ofType(AuthActions.signupSuccessful),
+        tap(() => router.navigate(['/']))
+    ),
     {
         functional: true,
         dispatch: false

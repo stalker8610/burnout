@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { TObjectId, TWithId } from '@models/common.model';
 import { ICompany } from '@models/company.model';
 import { IRespondent } from '@models/respondent.model';
+import { ISignupToken } from '@models/token.model';
 import { Scopes } from '@models/user.model';
 import { IUser } from '@models/user.model';
 
@@ -14,8 +15,6 @@ export type TLoginResult = {
     scope: Scopes,
     respondent: TWithId<IRespondent>
 }
-
-type TSignupResult = {}
 
 @Injectable({
     providedIn: 'root'
@@ -30,7 +29,6 @@ export class AuthService {
 
     public logIn(email: string, password: string) {
         return this.httpClient.post<TLoginResult>('/api/auth/login', { email, password })
-
     }
 
     public logOut() {
@@ -38,13 +36,16 @@ export class AuthService {
     }
 
     public signUp(token: string, password: string) {
-        return this.httpClient.post<TSignupResult>('/api/auth/signup', { token, password })
+        return this.httpClient.post('/api/auth/signup', { token, password }, { responseType: 'text' });
 
     }
 
     public validateToken(token: string) {
-        return this.httpClient.get(`/api/tokens/validate/${token}`, { responseType: 'text' })
+        return this.httpClient.get<ISignupToken>(`/api/tokens/validate/${token}`);
+    }
 
+    public invite(tokenData: ISignupToken, inviterId: TObjectId<IRespondent>) {
+        return this.httpClient.post<TWithId<ISignupToken>>(`/api/tokens/issue`, { tokenData, inviterId });
     }
 
 }

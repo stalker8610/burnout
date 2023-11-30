@@ -2,7 +2,7 @@ import { addRespondentRequest, loadRequested } from '../../store/data/data.actio
 import { getDepartments } from '../../store/data/data.selectors';
 import { Store } from '@ngrx/store';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IDepartment } from '@models/department.model';
 import { TWithId } from '@models/common.model';
 import { Observable, of, startWith, map, switchMap, filter } from 'rxjs';
@@ -15,9 +15,12 @@ import { TNewResponentToCreate } from '../../store/data/data.actions';
     styleUrls: ['./company-edit.component.scss']
 })
 export class CompanyEditComponent implements OnInit {
-    userName = new FormControl('', { validators: [Validators.required] });
-    email = new FormControl('', { validators: [Validators.required, Validators.email] });
-    department = new FormControl<string | TWithId<IDepartment>>('', { validators: [Validators.required] });
+
+    formGroup = new FormGroup({
+        userName: new FormControl('', { validators: [Validators.required] }),
+        email: new FormControl('', { validators: [Validators.required, Validators.email] }),
+        department: new FormControl<string | TWithId<IDepartment>>('', { validators: [Validators.required] }),
+    })
 
     filteredDepartments$: Observable<IDepartment[]> = of([]);
 
@@ -27,7 +30,7 @@ export class CompanyEditComponent implements OnInit {
         this.store.dispatch(loadRequested());
         this.filteredDepartments$ = this.store.select(getDepartments).pipe(
             filter(departments => !!departments && !!departments.length),
-            switchMap(departments => this.department.valueChanges.pipe(
+            switchMap(departments => this.formGroup.controls.department.valueChanges.pipe(
                 startWith(''),
                 switchMap(value => typeof value === 'string' ? of(value) : of(value?.title)),
                 map((substring) => substring ? this._filter(departments!, substring) : departments!.slice()),
@@ -46,18 +49,19 @@ export class CompanyEditComponent implements OnInit {
     }
 
     addRespondent() {
+
         let newRespondent: TNewResponentToCreate;
         let newRespondentBase = {
-            name: this.userName.value!,
-            email: this.email.value!,
+            name: this.formGroup.controls.userName.value!,
+            email: this.formGroup.controls.email.value!,
         }
-        if (typeof this.department.value === 'object') {
+        if (typeof this.formGroup.controls.department.value === 'object') {
             newRespondent = Object.assign({}, newRespondentBase, {
-                departmentId: this.department.value!._id
+                departmentId: this.formGroup.controls.department.value!._id
             })
         } else {
             newRespondent = Object.assign({}, newRespondentBase, {
-                newDepartmentTitle: this.department.value!
+                newDepartmentTitle: this.formGroup.controls.department.value!
             })
         }
         this.store.dispatch(addRespondentRequest({ respondent: newRespondent }));
@@ -65,12 +69,21 @@ export class CompanyEditComponent implements OnInit {
     }
 
     newDepartmentWillBeCreated(): boolean {
-        return !!(this.department.value && typeof this.department.value === 'string')
+        return !!(this.formGroup.controls.department.value && typeof this.formGroup.controls.department.value === 'string')
+    }
+
+    getErrorText(controlName: 'userName' | 'email' | 'department') {
+        const control = this.formGroup.controls[controlName];
+        if (control.hasError('required')) {
+            return 'Заполните поле'
+        } else if (control.hasError('email')) {
+            return 'Неверный формат'
+        } else return ''
     }
 
     resetForm() {
-        this.userName.reset();
-        this.email.reset();
-        this.department.reset();
+        this.formGroup.reset();
+        /* this.formGroup.controls.email.reset();
+        this.formGroup.controls.department.reset(); */
     }
 }

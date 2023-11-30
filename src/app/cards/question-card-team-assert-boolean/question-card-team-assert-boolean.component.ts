@@ -55,10 +55,13 @@ export class QuestionCardTeamAssertBooleanComponent implements QuestionComponent
     }
 
     confirmAnswer(): TAnswerTeamAssertBoolean {
-        const result: TAnswerTeamAssertBoolean = {};
+        const result: TAnswerTeamAssertBoolean = [];
         this.selectionModelArray.forEach((selectionModel, index) => {
             if (selectionModel.selected.length) {
-                result[this.inputData.team[index]._id] = selectionModel.selected[0];
+                result.push({
+                    respondentId: this.inputData.team[index]._id,
+                    is: selectionModel.selected[0]
+                })
             }
         })
         return result;

@@ -9,9 +9,6 @@ import { getCurrentQuestionIndex, getLoaded, getSurvey } from "./survey.selector
 import { SurveyService } from "src/app/services/survey.service"
 import { handleError } from "../error.handler"
 
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { getAuthorizedUser } from "../auth/auth.selectors"
-
 export const loadDataRequested$ = createEffect(
     (actions$ = inject(Actions), store = inject(Store)) =>
         actions$.pipe(
@@ -108,51 +105,5 @@ export const operationCompleteSuccessful$ = createEffect(
         ),
     { functional: true }
 )
-
-export const errorOccured$ = createEffect(
-    (actions$ = inject(Actions)) => {
-
-        const snackBar = inject(MatSnackBar);
-
-        return actions$.pipe(
-            ofType(
-                SurveyActions.loadFailed,
-                SurveyActions.operationFailed,
-                SurveyActions.surveyCompleteFailed
-            ),
-            tap(action => {
-                snackBar.open(action.message, 'Закрыть', {
-                    duration: 3000
-                });
-            })
-        )
-    },
-    {
-        functional: true,
-        dispatch: false
-    }
-)
-
-
-/* export const doneSuccessful$ = createEffect(
-    (actions$ = inject(Actions)) => {
-
-        const snackBar = inject(MatSnackBar);
-
-        return actions$.pipe(
-            ofType(
-            ),
-            tap(action => {
-                snackBar.open(action.message, 'Закрыть', {
-                    duration: 3000
-                });
-            })
-        )
-    },
-    {
-        functional: true,
-        dispatch: false
-    }
-) */
 
 

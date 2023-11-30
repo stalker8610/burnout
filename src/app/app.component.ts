@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    title = 'anti-burnout';
+    title = 'Антивыгорание';
 
     public readonly copyrightMessage = `\u00A9 ALEXROVICH.RU, 2013-${new Date().getFullYear()}`;;
 

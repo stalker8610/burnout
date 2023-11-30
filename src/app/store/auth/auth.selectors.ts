@@ -24,3 +24,28 @@ export const getAuthorizedUser = createSelector(
     selectFeature,
     (state: IState) => state.authorizedUser
 )
+
+export const getTokenValidationError = createSelector(
+    selectFeature,
+    (state: IState) => state.error
+)
+
+export const getSignupError = createSelector(
+    selectFeature,
+    (state: IState) => state.error
+)
+
+export const isSignupTokenValid = createSelector(
+    selectFeature,
+    (state: IState) => state.isTokenValid
+)
+
+export const getSignupToken = createSelector(
+    selectFeature,
+    (state: IState) => state.isTokenValid
+)
+
+export const isSignUpSuccessful = createSelector(
+    selectFeature,
+    (state: IState) => state.isSignUpSuccessful
+)

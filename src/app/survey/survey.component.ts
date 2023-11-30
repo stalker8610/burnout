@@ -4,12 +4,12 @@ import { Type } from '@angular/core';
 import { IQuestion } from '@models/survey.model';
 import { Store } from '@ngrx/store';
 import { loadRequested } from '../store/survey/survey.actions';
-import { filter, delay, map } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { TTeammate } from '@models/survey.model';
 
 import { getAuthorizedUser } from '../store/auth/auth.selectors';
 import { getLoaded, getSurvey } from '../store/survey/survey.selectors';
-import { loadRequested as loadCompanyStrucureRequested} from '../store/data/data.actions';
+import { loadRequested as loadCompanyStrucureRequested } from '../store/data/data.actions';
 
 interface AbstractQuestionInputData {
     questionId: TObjectId<IQuestion>,
@@ -70,7 +70,7 @@ export class SurveyComponent implements OnInit {
             this.store.select(getAuthorizedUser)
                 .pipe(
                     filter(user => !!user),
-                    /* delay(1000) */)
+                )
                 .subscribe(
                     user => this.store.dispatch(loadRequested({ respondentId: user!.respondentId }))
                 )
@@ -79,5 +79,5 @@ export class SurveyComponent implements OnInit {
         }
 
     }
-    
+
 }

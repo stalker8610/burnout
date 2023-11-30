@@ -14,7 +14,7 @@ export class LoginComponent {
     email = new FormControl('', { validators: [Validators.required, Validators.email] });
     password = new FormControl('', { validators: [Validators.required] });
 
-    error$ = this.store.select(getLoginError);
+   /*  error$ = this.store.select(getLoginError); */
 
     constructor(private store: Store) { }
 

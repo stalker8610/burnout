@@ -2,13 +2,13 @@ import { Component, Input, ViewChild, ComponentRef, OnInit } from '@angular/core
 import { QuestionDirective } from '../question.directive';
 import { QuestionComponent } from '../question.interface';
 
-import { distinctUntilChanged, map, filter, delay } from 'rxjs';
+import { distinctUntilChanged, map, filter, combineLatest } from 'rxjs';
 import { QuestionItem } from '../../survey/survey.component';
 import { TObjectId, TWithId } from '@models/common.model';
 import { EOperationStatus, IQuestion, TQuestionConfirmedAnswer } from '@models/survey.model';
 import { ISurvey } from '@models/survey.model';
 import { Store } from '@ngrx/store';
-import { nextQuestionRequested, answerConfirmed, questionSkipped } from 'src/app/store/survey/survey.actions';
+import { answerConfirmed, questionSkipped } from 'src/app/store/survey/survey.actions';
 import { getCurrentQuestion, getCurrentQuestionIndex, getOperationStatus } from 'src/app/store/survey/survey.selectors';
 import { getTeamExceptAuthorizedUser, getTeammateForFeedback } from 'src/app/store/data/data.selectors';
 import { TTeammate } from '@models/survey.model';
@@ -20,8 +20,6 @@ import { QuestionCardTeamAssertCheckboxComponent } from '../question-card-team-a
 import { QuestionCardPersonalComponent } from '../question-card-personal/question-card-personal.component';
 import { QuestionCardTeamAssertBooleanComponent } from '../question-card-team-assert-boolean/question-card-team-assert-boolean.component';
 import { IRespondent } from '@models/respondent.model';
-import { concatLatestFrom } from '@ngrx/effects';
-
 
 
 @Component({
@@ -55,16 +53,13 @@ export class QuestionCardContainerComponent implements OnInit {
 
     ngOnInit(): void {
 
-        this.store.select(getCurrentQuestion)
+        combineLatest([
+            this.store.select(getCurrentQuestion),
+            this.store.select(getTeamExceptAuthorizedUser),
+            this.store.select(getTeammateForFeedback(this.feedbackToId))])
             .pipe(
-                filter(question => !!question),
-                concatLatestFrom(() => [
-                    this.store.select(getTeamExceptAuthorizedUser),
-                    this.store.select(getTeammateForFeedback(this.feedbackToId))
-                ]),
-                filter(([question, team, teammate]) => !!team && team.every(teammate => !!teammate.department) && !!teammate),
+                filter(([question, team, teammate]) => !!question && !!team && team.every(teammate => !!teammate.department) && !!teammate),
             )
-
             .subscribe(([question, team, teammate]) => {
                 this.currentQuestionId = question!._id;
 
@@ -83,15 +78,6 @@ export class QuestionCardContainerComponent implements OnInit {
                 this.title = questionItem.data.title ?? '';
                 this.subtitle = 'subtitle' in questionItem.data ? questionItem.data.subtitle : '';
             })
-
-        /* this.store.select(getCurrentQuestionIndex)
-            .subscribe(
-                index => {
-                    if (index === -1) {
-                        this.store.dispatch(nextQuestionRequested());
-                    }
-                }
-            ) */
     }
 
     getQuestionData(question: TWithId<IQuestion>, team: TTeammate[], teammate: TTeammate) {

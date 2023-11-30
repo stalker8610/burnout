@@ -13,6 +13,8 @@ import { FormControl } from '@angular/forms';
 import { getSignUpStatusView } from 'src/app/store/data/data.util';
 import { MatDialog } from '@angular/material/dialog';
 import { RespondentComponent } from '../respondent/respondent.component';
+import { invite } from 'src/app/store/auth/auth.actions';
+import { DepartmentComponent } from '../department/department.component';
 
 enum ENodeTypes {
     Department = 'department',
@@ -87,7 +89,7 @@ export class CompanyTreeComponent implements OnInit {
     editNode: IFlatNode | null = null;
     editNodeControl = new FormControl('');
 
-    constructor(private store: Store, public respondentDialog: MatDialog) { }
+    constructor(private store: Store, public editDialog: MatDialog) { }
 
     ngOnInit(): void {
         this.store.select(getDepartmentsAndTeam)
@@ -161,7 +163,8 @@ export class CompanyTreeComponent implements OnInit {
     }
 
     invitable = (node: IFlatNode) => {
-        return node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.NotInvitedYet;
+        return node.type === ENodeTypes.Respondent && (node.signUpStatus === SignUpStatus.NotInvitedYet ||
+            node.signUpStatus === SignUpStatus.Invited);
     }
 
     isDisabled = (node: IFlatNode) => {
@@ -187,7 +190,15 @@ export class CompanyTreeComponent implements OnInit {
     edit(node: IFlatNode) {
         /* this.editNode = node;
         this.editNodeControl.reset(node.title); */
-        this.openRespondentDialog(node._id);
+        if (node.type === ENodeTypes.Respondent) {
+            this.openRespondentEditDialog(node._id);
+        } else if (node.type === ENodeTypes.Department) {
+            this.openDepartmentEditDialog(node._id);
+        }
+    }
+
+    invite(node: IFlatNode) {
+        this.store.dispatch(invite({ respondentId: node._id }));
     }
 
     confirmEdit() {
@@ -231,11 +242,19 @@ export class CompanyTreeComponent implements OnInit {
     }
 
 
-    openRespondentDialog(respondentId: TObjectId<IRespondent>): void {
-        this.respondentDialog.open(RespondentComponent, {
+    openRespondentEditDialog(respondentId: TObjectId<IRespondent>): void {
+        this.editDialog.open(RespondentComponent, {
             width: '600px',
             disableClose: true,
             data: { respondentId }
+        });
+    }
+
+    openDepartmentEditDialog(departmentId: TObjectId<IDepartment>): void {
+        this.editDialog.open(DepartmentComponent, {
+            width: '600px',
+            disableClose: true,
+            data: { departmentId }
         });
     }
 

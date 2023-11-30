@@ -9,11 +9,10 @@ import { SurveyComponent } from '../survey/survey.component';
 import { ReportWallComponent } from '../reports/report-wall/report-wall.component';
 import { CompanyComponent } from '../company/company.component';
 import { LogoutComponent } from '../auth/logout/logout.component';
-import { ReportMyComponent } from '../reports/report-my/report-my.component';
 import { ReportCompanyComponent } from '../reports/report-company/report-company.component';
 
 import { isAuthorizedGuard, isHRUserGuard, isNotAuthorizedGuard, redirectHomeGuard } from './guards.service';
-import { RespondentComponent } from '../company/respondent/respondent.component';
+import { ReportPersonalComponent } from '../reports/report-personal/report-personal.component';
 
 
 const routes: Routes = [
@@ -39,7 +38,7 @@ const routes: Routes = [
             },
             {
                 path: 'my',
-                component: ReportMyComponent,
+                component: ReportPersonalComponent,
                 pathMatch: 'full'
             },
             {
@@ -68,7 +67,7 @@ const routes: Routes = [
 
 // configures NgModule imports and exports
 @NgModule({
-    imports: [RouterModule.forRoot(routes/* , { enableTracing: true } */)],
+    imports: [RouterModule.forRoot(routes, /* { enableTracing: true } */)],
     exports: [RouterModule],
     providers: [
         provideRouter(routes, withComponentInputBinding())]

@@ -1,0 +1,11 @@
+<div class="caption">Навыки</div>
+<div class="chart-container">
+    <ng-container *ngIf="data | async; else noDataProvided">
+        <canvas baseChart class="chart" [data]="chartData" [options]="chartOptions" [type]="'radar'">
+            <p>Ваш браузер не поддерживает работу с графикой</p>
+        </canvas>
+    </ng-container>
+    <ng-template #noDataProvided>
+        Недостаточно данных для отображения
+    </ng-template>
+</div>

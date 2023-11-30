@@ -34,6 +34,17 @@ export const getRespondent = (_id: TObjectId<IRespondent>) => createSelector(
     (state: IState) => state.data?.team.find(respondent => respondent._id === _id)!
 )
 
+export const getRespondentsOfDepartment = (_id: TObjectId<IDepartment>, withDisabled: boolean) => createSelector(
+    selectFeature,
+    getTeam(withDisabled),
+    (state: IState) => state.data?.team.filter(respondent => respondent.departmentId === _id)
+)
+
+export const getDepartment = (_id: TObjectId<IDepartment>) => createSelector(
+    selectFeature,
+    (state: IState) => state.data?.departments.find(department => department._id === _id)!
+)
+
 export const getTeamExceptAuthorizedUser = createSelector(
     getTeam(false),
     getDepartments,

@@ -28,7 +28,7 @@ export class QuestionCardTeamAssertCheckboxComponent implements QuestionComponen
 
     selectionModel = new SelectionModel<TTeammate>(true, [],)
 
-    constructor(private store: Store) {}
+    constructor(private store: Store) { }
 
     ngOnInit(): void {
 
@@ -58,7 +58,10 @@ export class QuestionCardTeamAssertCheckboxComponent implements QuestionComponen
     }
 
     confirmAnswer(): TAnswerTeamAssertCheckbox {
-        return this.selectionModel.selected.map(teammate => teammate._id);
+        return this.selectionModel.selected.map(teammate => ({
+            respondentId: teammate._id,
+            is: true
+        }));
     }
 
 }

@@ -57,16 +57,16 @@ export enum PersonalFeedbackMood {
     Happiest
 }
 
-export type TAnswerPersonal = {
-    newcomer: true
-} | {
-    mood?: PersonalFeedbackMood,
-    text?: string
-}
+export type TAnswerPersonal = { feedbackTo: TObjectId<IRespondent> } &
+    ({ newcomer: true } |
+    {
+        mood?: PersonalFeedbackMood,
+        text?: string
+    })
 
-export type TAnswerTeamAssertBoolean = Record<TObjectId<IRespondent>, boolean>
+export type TAnswerTeamAssertBoolean = { respondentId: TObjectId<IRespondent>, is: boolean }[]
 
-export type TAnswerTeamAssertCheckbox = TObjectId<IRespondent>[]
+export type TAnswerTeamAssertCheckbox = { respondentId: TObjectId<IRespondent>, is: true }[]
 
 export type TAnswerWall = {
     mood?: SelfMood,

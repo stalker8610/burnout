@@ -1,6 +1,8 @@
 import { NgModule, isDevMode } from '@angular/core';
-import { MAT_RIPPLE_GLOBAL_OPTIONS } from '@angular/material/core';
+import { MAT_RIPPLE_GLOBAL_OPTIONS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
@@ -18,16 +20,15 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDateFnsModule } from '@angular/material-date-fns-adapter';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { ru } from 'date-fns/locale';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { NgChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './routing/router.module';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { HomeComponent } from './home/home.component';
@@ -52,22 +53,53 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { authReducer } from './store/auth/auth.reducer';
 import { dataReducer } from './store/data/data.reducer';
 import { surveyReducer } from './store/survey/survey.reducer';
-import { reportWallReducer } from './store/reports/report-wall/report-wall.reducer';
-import { reportPassStatisticReducer } from './store/reports/report-pass-statistic/report-pass-statistic.reducer';
 import * as authEffects from './store/auth/auth.effects';
 import * as dataEffects from './store/data/data.effects';
 import * as surveyEffects from './store/survey/survey.effects';
-import * as reportWallEffects from './store/reports/report-wall/report-wall.effects';
-import * as reportPassStatisticEffects from './store/reports/report-pass-statistic/report-pass-statistic.effects';
+import * as messagableEffects from './store/messagable.effects';
+
+import {
+    reducer as reportWallReducer,
+    effects as reportWallEffects
+} from './store/reports/report-wall.store';
+
+import {
+    reducer as reportPersonalEfficiencyReducer,
+    effects as reportPersonalEfficiencyEffects
+} from './store/reports/report-personal-efficiency.store';
+
+import {
+    reducer as reportPersonalSkillsReducer,
+    effects as reportPersonalSkillsEffects
+} from './store/reports/report-personal-skills.store';
+
+import {
+    reducer as reportCompanyScoresReducer,
+    effects as reportCompanyScoresEffects
+} from './store/reports/report-company-scores.store';
+
+import {
+    reducer as reportPassStatisticReducer,
+    effects as reportPassStatisticEffects
+} from './store/reports/report-pass-statistic.store';
+
+
+
+
 
 import { CompanyEditComponent } from './company/company-edit/company-edit.component';
 import { RespondentComponent } from './company/respondent/respondent.component';
 import { DepartmentComponent } from './company/department/department.component';
 import { FocusableDirective } from './focusable.directive';
-import { ReportMyComponent } from './reports/report-my/report-my.component';
+
 import { ReportCompanyComponent } from './reports/report-company/report-company.component';
 import { ReportPassStatisticComponent } from './reports/report-company/report-pass-statistic/report-pass-statistic.component';
-import { NgChartsModule } from 'ng2-charts';
+import { ReportCompanyScoresComponent } from './reports/report-company/report-company-scores/report-company-scores.component';
+
+import { ReportPersonalComponent } from './reports/report-personal/report-personal.component';
+import { ReportPersonalEfficiencyComponent } from './reports/report-personal/report-personal-efficiency/report-personal-efficiency.component';
+import { ReportPersonalSkillsComponent } from './reports/report-personal/report-personal-skills/report-personal-skills.component';
+
 
 @NgModule({
     declarations: [
@@ -93,9 +125,12 @@ import { NgChartsModule } from 'ng2-charts';
         RespondentComponent,
         DepartmentComponent,
         FocusableDirective,
-        ReportMyComponent,
+        ReportPersonalEfficiencyComponent,
         ReportCompanyComponent,
-        ReportPassStatisticComponent
+        ReportPassStatisticComponent,
+        ReportCompanyScoresComponent,
+        ReportPersonalComponent,
+        ReportPersonalSkillsComponent
     ],
     imports: [
         BrowserModule,
@@ -120,19 +155,27 @@ import { NgChartsModule } from 'ng2-charts';
         MatDateFnsModule,
         MatSelectModule,
         MatDialogModule,
+        MatToolbarModule,
         StoreModule.forRoot({
             auth: authReducer,
             company: dataReducer,
             survey: surveyReducer,
             reportWall: reportWallReducer,
-            reportPassStatistic: reportPassStatisticReducer
+            reportPassStatistic: reportPassStatisticReducer,
+            reportCompanyScores: reportCompanyScoresReducer,
+            reportPersonalEfficiency: reportPersonalEfficiencyReducer,
+            reportPersonalSkills: reportPersonalSkillsReducer
         }, {}),
         EffectsModule.forRoot(
             authEffects,
             dataEffects,
             surveyEffects,
             reportWallEffects,
-            reportPassStatisticEffects),
+            reportPassStatisticEffects,
+            reportCompanyScoresEffects,
+            reportPersonalEfficiencyEffects,
+            reportPersonalSkillsEffects,
+            messagableEffects),
         StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
         NgChartsModule
     ],

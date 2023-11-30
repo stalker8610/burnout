@@ -11,7 +11,7 @@ import { getScopeView, getSignUpStatusView } from 'src/app/store/data/data.util'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { removeRespondent, patchRespondent } from 'src/app/store/data/data.actions';
 
-export interface DialogData {
+interface DialogData {
     respondentId: TObjectId<IRespondent>
 }
 
