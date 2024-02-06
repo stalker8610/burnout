@@ -101,7 +101,7 @@ export class ReportPersonalSkillsComponent {
 
                         const ratings = records.map(skill => skill.score);
                         const socialCapitals = records.map(skill => skill.positive);
-                        const skills = records.map(skill => skill.score >= 1 ? skill.positive / skill.score * 100 : 0);
+                        const skills = records.map(skill => skill.score >= 1 ? skill.positive / skill.count * 100 : 0);
 
 
                         this.chartData = {

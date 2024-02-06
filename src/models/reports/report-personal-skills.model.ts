@@ -11,11 +11,15 @@ export interface IReportPersonalSkillsRecord {
             asserts: Array<{
                 is: boolean,
                 score: -1 | 1,
-                positive: 1 | 0
-            }>
+                positive: 1 | 0,
+            }>,
+            score: number,
+            positive: number,
+            count: number
         }>,
         score: number,
-        positive: number
+        positive: number,
+        count: number
     }>
 }
 
