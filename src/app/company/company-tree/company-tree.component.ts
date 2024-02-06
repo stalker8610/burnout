@@ -2,7 +2,7 @@ import { IRespondent, SignUpStatus } from '@models/respondent.model';
 import { IDepartment } from '@models/department.model';
 import { TObjectId } from '@models/common.model';
 import { map, switchMap, tap, of } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { Store } from '@ngrx/store';
@@ -47,7 +47,8 @@ type IFlatNode = ITreeNode & {
 @Component({
     selector: 'app-company-tree',
     templateUrl: './company-tree.component.html',
-    styleUrls: ['./company-tree.component.scss']
+    styleUrls: ['./company-tree.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompanyTreeComponent implements OnInit {
 
