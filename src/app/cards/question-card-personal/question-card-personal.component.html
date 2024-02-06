@@ -13,7 +13,7 @@
 </div>
 <div class="emotions" [class.disabled]="newcomer">
     <div *ngFor="let item of moods" class="emotion">
-        <img [src]="item.imgSrc" (click)="selectionModel.toggle(item.mood)" [@checked]="getState(item.mood)">
+        <img [src]="item.imgSrc" (click)="selectionModel.toggle(item.mood)" [@checked]="getState(item.mood)" width="75" height="75">
         <div class="label">
             {{item.label}}
         </div>

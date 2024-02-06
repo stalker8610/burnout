@@ -8,7 +8,7 @@
 
         <div *ngIf="survey | async as survey; else surveyNotFoundBlock">
             <div *ngIf="surveyCompleted | async; else questionBlock" class="completed">
-                <img src="assets/images/survey-completed.png">
+                <img src="assets/images/survey-completed.png" width="144" height="144">
                 <div>Вот и все! Отличная работа!</div>
             </div>
             <ng-template #questionBlock>
