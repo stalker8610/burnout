@@ -1,6 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { TObjectId, IWithMessage } from '@models/common.model';
-import { ICompany } from "@models/company.model";
+import { IWithMessage } from '@models/common.model';
 
 const reportActionNames = (reportName: string) => ({
     ReportRequested: `[Report ${reportName} Page] Report Requested`,
@@ -15,13 +14,11 @@ export const reportActions = <TData, TQuery>(reportName: string) => {
     return {
         reportRequested: createAction(
             actionNames.ReportRequested,
-            //props<{ companyId: TObjectId<ICompany> }>()
             props<{ query: TQuery }>()
         ),
         reportLoad: createAction(
             actionNames.ReportLoad,
             props<{ query: TQuery }>()
-            //props<{ companyId: TObjectId<ICompany> }>()
 
         ),
         reportLoadFailed: createAction(
