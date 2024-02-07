@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AuthActions } from 'src/app/store/auth/auth.actions';
-import { getLoginError } from 'src/app/store/auth/auth.selectors';
 
 @Component({
     selector: 'app-login',
@@ -13,8 +12,6 @@ export class LoginComponent {
 
     email = new FormControl('', { validators: [Validators.required, Validators.email] });
     password = new FormControl('', { validators: [Validators.required] });
-
-   /*  error$ = this.store.select(getLoginError); */
 
     constructor(private store: Store) { }
 

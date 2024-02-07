@@ -1,17 +1,12 @@
 <form class="login-form">
-    <mat-form-field>
+    <mat-form-field id="email">
         <mat-label>Ваш e-mail</mat-label>
         <input matInput placeholder="my-email@yandex.ru" [formControl]="email">
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field id="password">
         <mat-label>Ваш пароль</mat-label>
         <input matInput placeholder="password" type="password" [formControl]="password">
     </mat-form-field>
     <button mat-stroked-button (click)="auth()" type="button" [disabled]="email.invalid || password.invalid"
         color="primary">Войти</button>
-    <!-- <div class="message-container">
-        <div *ngIf="error$ | async as error" class="error">
-            {{error}}
-        </div>
-    </div> -->
 </form>
