@@ -30,13 +30,12 @@ export class QuestionCardCompanyComponent implements QuestionComponent {
 
     @Input() inputData!: CompanyQuestionInputData;
     readonly maxScore = 10;
-    scores = new Array(this.maxScore).fill(0);
+    score = 0;
     emptyAnswer = new BehaviorSubject<boolean>(true);
 
     choice(i: number) {
-        for (let k = 0; k < this.maxScore; k++) {
-            this.scores[k] = k <= i ? 1 : 0;
-        }
+        this.score = i + 1;
+        console.log(this.score);
         this.updateEmptyAnswerState();
     }
 
@@ -44,12 +43,12 @@ export class QuestionCardCompanyComponent implements QuestionComponent {
 
     confirmAnswer(): TAnswerCompany {
         return {
-            score: this.scores.lastIndexOf(1) + 1
+            score: this.score
         }
     }
 
     updateEmptyAnswerState() {
-        const emptyAnswer = this.scores.every(value => value === 0);
+        const emptyAnswer = this.score === 0;
         this.emptyAnswer.next(emptyAnswer);
     }
 
