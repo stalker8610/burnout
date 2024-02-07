@@ -1,6 +1,6 @@
 import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { DataActions } from './data/data.actions';
-import * as SurveyActions from './survey/survey.actions'
+import { SurveyActions } from './survey/survey.actions'
 import { createEffect } from "@ngrx/effects"
 import { inject } from '@angular/core'
 import { Actions, ofType } from "@ngrx/effects"
@@ -30,7 +30,7 @@ export const errorOccured$ = createEffect(
                 SurveyActions.loadFailed,
                 SurveyActions.operationFailed,
                 SurveyActions.surveyCompleteFailed
-                
+
             ),
             tap(action => {
                 if (action.message)

@@ -1,6 +1,6 @@
 import { createEffect } from "@ngrx/effects"
 import { Actions, ofType } from "@ngrx/effects"
-import * as SurveyActions from './survey.actions'
+import { SurveyActions } from './survey.actions'
 import { concatLatestFrom } from "@ngrx/effects"
 import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core'

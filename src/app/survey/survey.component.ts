@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Type } from '@angular/core';
 import { IQuestion } from '@models/survey.model';
 import { Store } from '@ngrx/store';
-import { loadRequested } from '../store/survey/survey.actions';
+import { SurveyActions } from '../store/survey/survey.actions';
 import { filter, map } from 'rxjs';
 import { TTeammate } from '@models/survey.model';
 
@@ -72,10 +72,10 @@ export class SurveyComponent implements OnInit {
                     filter(user => !!user),
                 )
                 .subscribe(
-                    user => this.store.dispatch(loadRequested({ respondentId: user!.respondentId }))
+                    user => this.store.dispatch(SurveyActions.loadRequested({ respondentId: user!.respondentId }))
                 )
         } else {
-            this.store.dispatch(loadRequested({ surveyId: this.surveyId }))
+            this.store.dispatch(SurveyActions.loadRequested({ surveyId: this.surveyId }))
         }
 
     }

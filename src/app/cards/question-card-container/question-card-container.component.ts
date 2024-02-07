@@ -8,7 +8,7 @@ import { TObjectId, TWithId } from '@models/common.model';
 import { EOperationStatus, IQuestion, TQuestionConfirmedAnswer } from '@models/survey.model';
 import { ISurvey } from '@models/survey.model';
 import { Store } from '@ngrx/store';
-import { answerConfirmed, questionSkipped } from 'src/app/store/survey/survey.actions';
+import { SurveyActions } from 'src/app/store/survey/survey.actions';
 import { getCurrentQuestion, getCurrentQuestionIndex, getOperationStatus } from 'src/app/store/survey/survey.selectors';
 import { getTeamExceptAuthorizedUser, getTeammateForFeedback } from 'src/app/store/data/data.selectors';
 import { TTeammate } from '@models/survey.model';
@@ -128,7 +128,7 @@ export class QuestionCardContainerComponent implements OnInit {
             confirmedAnswer.anonymous = true;
         }
 
-        this.store.dispatch(answerConfirmed({ surveyId: this.surveyId, answer: confirmedAnswer }))
+        this.store.dispatch(SurveyActions.answerConfirmed({ surveyId: this.surveyId, answer: confirmedAnswer }))
 
     }
 
@@ -136,7 +136,7 @@ export class QuestionCardContainerComponent implements OnInit {
         const skipped = {
             questionId: this.currentQuestionId!
         }
-        this.store.dispatch(questionSkipped({ surveyId: this.surveyId, skipped }))
+        this.store.dispatch(SurveyActions.questionSkipped({ surveyId: this.surveyId, skipped }))
     }
 
 }

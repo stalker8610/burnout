@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import * as Actions from "./survey.actions";
+import { SurveyActions } from "./survey.actions";
 import { TWithId } from "@models/common.model";
 import { ISurvey, EOperationStatus } from "@models/survey.model";
 
@@ -22,46 +22,46 @@ const initialState: IState = {
 
 export const surveyReducer = createReducer(
     initialState,
-    on(Actions.load, state => ({
+    on(SurveyActions.load, state => ({
         ...state,
         loaded: false,
         error: null,
     })),
-    on(Actions.loadFailed, (state, { message }) => ({
+    on(SurveyActions.loadFailed, (state, { message }) => ({
         ...state,
         error: message,
     })),
-    on(Actions.loadSuccessful, (state, { survey }) => ({
+    on(SurveyActions.loadSuccessful, (state, { survey }) => ({
         ...state,
         loaded: true,
         survey,
         currentQuestionIndex: survey?.progress || 0
     })),
-    on(Actions.nextQuestionRequestCompleted, state => ({
+    on(SurveyActions.nextQuestionRequestCompleted, state => ({
         ...state,
         currentQuestionIndex: state.currentQuestionIndex + 1,
         operationStatus: EOperationStatus.Wait
     })),
-    on(Actions.answerConfirmed, state => ({
+    on(SurveyActions.answerConfirmed, state => ({
         ...state,
         operationStatus: EOperationStatus.Pending,
         error: null
     })),
-    on(Actions.questionSkipped, state => ({
+    on(SurveyActions.questionSkipped, state => ({
         ...state,
         operationStatus: EOperationStatus.Pending,
         error: null
     })),
-    on(Actions.operationCompletedSuccessful, state => ({
+    on(SurveyActions.operationCompletedSuccessful, state => ({
         ...state,
         operationStatus: EOperationStatus.Complete
     })),
-    on(Actions.operationFailed, (state, { message }) => ({
+    on(SurveyActions.operationFailed, (state, { message }) => ({
         ...state,
         operationStatus: EOperationStatus.Failed,
         error: message
     })),
-    on(Actions.surveyCompleteSuccessful, (state, { survey }) => ({
+    on(SurveyActions.surveyCompleteSuccessful, (state, { survey }) => ({
         ...state,
         survey
     }))
