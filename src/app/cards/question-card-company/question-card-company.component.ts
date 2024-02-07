@@ -35,7 +35,6 @@ export class QuestionCardCompanyComponent implements QuestionComponent {
 
     choice(i: number) {
         this.score = i + 1;
-        console.log(this.score);
         this.updateEmptyAnswerState();
     }
 
