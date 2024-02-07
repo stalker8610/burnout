@@ -13,7 +13,7 @@ import { FormControl } from '@angular/forms';
 import { getSignUpStatusView } from 'src/app/store/data/data.util';
 import { MatDialog } from '@angular/material/dialog';
 import { RespondentComponent } from '../respondent/respondent.component';
-import { invite } from 'src/app/store/auth/auth.actions';
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { DepartmentComponent } from '../department/department.component';
 
 enum ENodeTypes {
@@ -199,7 +199,7 @@ export class CompanyTreeComponent implements OnInit {
     }
 
     invite(node: IFlatNode) {
-        this.store.dispatch(invite({ respondentId: node._id }));
+        this.store.dispatch(AuthActions.invite({ respondentId: node._id }));
     }
 
     confirmEdit() {

@@ -2,7 +2,8 @@ import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, Valid
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Component, Input, OnInit } from '@angular/core';
 import { take, filter, BehaviorSubject } from 'rxjs';
-import { signup, validateToken } from 'src/app/store/auth/auth.actions';
+import { AuthActions } from 'src/app/store/auth/auth.actions';
+
 import { Store } from '@ngrx/store';
 import { getSignupError, isSignUpSuccessful, isSignupTokenValid } from 'src/app/store/auth/auth.selectors';
 
@@ -42,7 +43,7 @@ export class SignupComponent implements OnInit {
     ngOnInit(): void {
         this.inProcess.next(true);
 
-        this.store.dispatch(validateToken({ token: this.token }));
+        this.store.dispatch(AuthActions.validateToken({ token: this.token }));
         this.store.select(isSignupTokenValid)
             .pipe(
                 filter(value => !!value),
@@ -54,7 +55,7 @@ export class SignupComponent implements OnInit {
     signUp() {
         this.inProcess.next(true);
         const password = this.passwordGroup.controls.password.value!;
-        this.store.dispatch(signup({ token: this.token, password }));
+        this.store.dispatch(AuthActions.signup({ token: this.token, password }));
         this.store.select(isSignUpSuccessful)
             .pipe(
                 filter(value => !value),

@@ -1,6 +1,6 @@
 
 import { createReducer, on } from "@ngrx/store";
-import * as AuthActions from "./auth.actions";
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { TLoginResult } from '../../services/auth.service';
 import { TObjectId } from "@models/common.model";
 import { ISignupToken } from "@models/token.model";

@@ -3,7 +3,7 @@ import { createEffect } from "@ngrx/effects"
 import { DataService } from "../../services/data.service"
 import { Actions, ofType } from "@ngrx/effects"
 import * as DataActions from './data.actions'
-import * as AuthActions from '../auth/auth.actions'
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { map, catchError, exhaustMap, of, filter} from "rxjs"
 import { inject } from '@angular/core'
 import { IDepartment } from "@models/department.model"

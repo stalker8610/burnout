@@ -1,4 +1,4 @@
-import * as AuthActions from './auth/auth.actions'
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import * as DataActions from './data/data.actions'
 import * as SurveyActions from './survey/survey.actions'
 import { createEffect } from "@ngrx/effects"

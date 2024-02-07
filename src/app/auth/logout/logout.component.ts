@@ -1,7 +1,7 @@
 import { getLogoutError } from '../../store/auth/auth.selectors';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { logout } from 'src/app/store/auth/auth.actions';
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 
 @Component({
     selector: 'app-logout',
@@ -15,6 +15,6 @@ export class LogoutComponent implements OnInit {
     constructor(private store: Store) { }
 
     ngOnInit(): void {
-        this.store.dispatch(logout());
+        this.store.dispatch(AuthActions.logout());
     }
 }

@@ -4,7 +4,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { map, take, tap, filter } from 'rxjs';
-import { authStatusRequested } from '../store/auth/auth.actions';
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { concatLatestFrom } from '@ngrx/effects';
 import { Scopes } from '@models/user.model';
 
@@ -38,7 +38,7 @@ export const isAdminUserGuard: CanActivateFn = (route, state) => {
 
 const getUser = () => {
     const store = inject(Store);
-    store.dispatch(authStatusRequested());
+    store.dispatch(AuthActions.authStatusRequested());
 
     return store.select(requestDone).pipe(
         filter(done => done),

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { login } from 'src/app/store/auth/auth.actions';
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { getLoginError } from 'src/app/store/auth/auth.selectors';
 
 @Component({
@@ -19,7 +19,7 @@ export class LoginComponent {
     constructor(private store: Store) { }
 
     auth() {
-        this.store.dispatch(login({ email: this.email.value as string, password: this.password.value as string }));
+        this.store.dispatch(AuthActions.login({ email: this.email.value as string, password: this.password.value as string }));
     }
 
 }

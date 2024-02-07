@@ -1,7 +1,7 @@
 import { createEffect } from "@ngrx/effects"
 import { AuthService, TLoginResult } from "../../services/auth.service"
 import { Actions, ofType } from "@ngrx/effects"
-import * as AuthActions from './auth.actions'
+import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
 import { inject } from '@angular/core';
 import { Router } from "@angular/router"
