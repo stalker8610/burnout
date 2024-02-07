@@ -4,6 +4,7 @@ import { TObjectId, IWithMessage, TWithId } from "@models/common.model";
 import { IDepartment } from "@models/department.model";
 import { INewRespondent, IRespondent } from "@models/respondent.model";
 
+export type TNewResponentToCreate = INewRespondentWithExistDepartment | INewRespondentWithDepartmentToCreate;
 
 export const DataActions = createActionGroup({
     source: 'Data API',
@@ -57,7 +58,7 @@ interface INewRespondentWithDepartmentToCreate extends NewRespondentBase {
     newDepartmentTitle: IDepartment['title']
 }
 
-export type TNewResponentToCreate = INewRespondentWithExistDepartment | INewRespondentWithDepartmentToCreate;
+
 
 
 
