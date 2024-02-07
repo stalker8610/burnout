@@ -9,7 +9,7 @@ import { TTeammate } from '@models/survey.model';
 
 import { getAuthorizedUser } from '../store/auth/auth.selectors';
 import { getLoaded, getSurvey } from '../store/survey/survey.selectors';
-import { loadRequested as loadCompanyStrucureRequested } from '../store/data/data.actions';
+import { DataActions } from '../store/data/data.actions';
 
 interface AbstractQuestionInputData {
     questionId: TObjectId<IQuestion>,
@@ -64,7 +64,7 @@ export class SurveyComponent implements OnInit {
 
     ngOnInit() {
 
-        this.store.dispatch(loadCompanyStrucureRequested());
+        this.store.dispatch(DataActions.loadRequested());
 
         if (!this.surveyId) {
             this.store.select(getAuthorizedUser)

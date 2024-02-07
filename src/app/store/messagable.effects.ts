@@ -1,5 +1,5 @@
 import { AuthActions } from 'src/app/store/auth/auth.actions';
-import * as DataActions from './data/data.actions'
+import { DataActions } from './data/data.actions';
 import * as SurveyActions from './survey/survey.actions'
 import { createEffect } from "@ngrx/effects"
 import { inject } from '@angular/core'

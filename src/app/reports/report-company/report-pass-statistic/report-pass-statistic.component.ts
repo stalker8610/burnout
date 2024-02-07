@@ -3,7 +3,7 @@ import { ChartConfiguration } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { Store } from '@ngrx/store';
 import { actions, selectors } from 'src/app/store/reports/report-pass-statistic.store';
-import { loadRequested } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 import { getAuthorizedUser } from 'src/app/store/auth/auth.selectors';
 import { filter, take } from 'rxjs'
 import { colorDataset, datasetColorOptions } from '../../reports.util';
@@ -80,7 +80,7 @@ export class ReportPassStatisticComponent implements OnInit {
     constructor(private readonly store: Store) { }
 
     ngOnInit(): void {
-        this.store.dispatch(loadRequested());
+        this.store.dispatch(DataActions.loadRequested());
 
         this.store.select(getAuthorizedUser)
             .pipe(

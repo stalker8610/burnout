@@ -9,7 +9,7 @@ import { Scopes } from '@models/user.model';
 import { IDepartment } from '@models/department.model';
 import { getScopeView, getSignUpStatusView } from 'src/app/store/data/data.util';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { removeRespondent, patchRespondent } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 
 interface DialogData {
     respondentId: TObjectId<IRespondent>
@@ -110,7 +110,7 @@ export class RespondentComponent implements OnInit {
     save() {
         this.waitingForApply = true;
         if (this.disable.value) {
-            this.store.dispatch(removeRespondent({ _id: this.respondentId }));
+            this.store.dispatch(DataActions.removeRespondent({ _id: this.respondentId }));
         } else {
 
             const formData = this.formGroup.getRawValue();
@@ -128,7 +128,7 @@ export class RespondentComponent implements OnInit {
                 scope: formData.scope as Scopes
             }
 
-            this.store.dispatch(patchRespondent({ respondent }));
+            this.store.dispatch(DataActions.patchRespondent({ respondent }));
         }
         this.dialogRef.close();
 

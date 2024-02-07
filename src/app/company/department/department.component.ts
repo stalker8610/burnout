@@ -4,7 +4,7 @@ import { TObjectId, TWithId } from '@models/common.model';
 import { Store } from '@ngrx/store';
 import { IDepartment } from '@models/department.model';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { removeDepartment, patchDepartment } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 import { getDepartment, getRespondentsOfDepartment } from 'src/app/store/data/data.selectors';
 import { filter, map, Observable } from 'rxjs';
 import { IRespondent } from '@models/respondent.model';
@@ -68,7 +68,7 @@ export class DepartmentComponent implements OnInit {
     save() {
         //        this.waitingForApply = true;
         if (this.disable.value) {
-            this.store.dispatch(removeDepartment({ _id: this.departmentId }));
+            this.store.dispatch(DataActions.removeDepartment({ _id: this.departmentId }));
         } else {
 
             const formData = this.formGroup.getRawValue();
@@ -78,7 +78,7 @@ export class DepartmentComponent implements OnInit {
                 title: formData.title,
             }
 
-            this.store.dispatch(patchDepartment({ department }));
+            this.store.dispatch(DataActions.patchDepartment({ department }));
         }
         this.dialogRef.close();
 

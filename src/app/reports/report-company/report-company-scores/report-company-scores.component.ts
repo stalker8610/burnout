@@ -5,7 +5,7 @@ import { ChartConfiguration } from 'chart.js';
 import { filter, take, map } from 'rxjs'
 import { actions, selectors } from 'src/app/store/reports/report-company-scores.store';
 import { Store } from '@ngrx/store';
-import { loadRequested } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 import { getAuthorizedUser } from 'src/app/store/auth/auth.selectors';
 import { colorDataset } from '../../reports.util';
 
@@ -94,7 +94,7 @@ export class ReportCompanyScoresComponent {
     constructor(private readonly store: Store) {}
 
     ngOnInit(): void {
-        this.store.dispatch(loadRequested());
+        this.store.dispatch(DataActions.loadRequested());
 
         this.store.select(getAuthorizedUser)
             .pipe(

@@ -1,6 +1,6 @@
 import { TCompanyStructure } from '@models/company.model';
 import { createReducer, on } from "@ngrx/store";
-import * as DataActions from "./data.actions";
+import { DataActions } from "./data.actions";
 import { TWithId } from "@models/common.model";
 import { IDepartment } from "@models/department.model";
 import { IRespondent } from "@models/respondent.model";

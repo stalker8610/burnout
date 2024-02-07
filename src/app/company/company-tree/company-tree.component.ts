@@ -8,7 +8,7 @@ import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree'
 import { Store } from '@ngrx/store';
 import { getDepartmentsAndTeam, getTeam } from '../../store/data/data.selectors';
 import { concatRespondentName, parseName } from 'src/app/store/data/data.util';
-import { removeDepartment, removeRespondent, patchRespondent, patchDepartment } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 import { FormControl } from '@angular/forms';
 import { getSignUpStatusView } from 'src/app/store/data/data.util';
 import { MatDialog } from '@angular/material/dialog';
@@ -214,13 +214,13 @@ export class CompanyTreeComponent implements OnInit {
                 _id: this.editNode._id,
                 ...parseName(this.editNodeControl.value)
             }
-            this.store.dispatch(patchRespondent({ respondent }))
+            this.store.dispatch(DataActions.patchRespondent({ respondent }))
         } else if (this.editNode?.type === ENodeTypes.Department) {
             const department = {
                 _id: this.editNode._id,
                 title: this.editNodeControl.value
             }
-            this.store.dispatch(patchDepartment({ department }));
+            this.store.dispatch(DataActions.patchDepartment({ department }));
         }
 
         this.editNode = null;
@@ -236,9 +236,9 @@ export class CompanyTreeComponent implements OnInit {
 
     remove(node: IFlatNode) {
         if (node.type === ENodeTypes.Respondent) {
-            this.store.dispatch(removeRespondent({ _id: node._id }))
+            this.store.dispatch(DataActions.removeRespondent({ _id: node._id }))
         } else if (node.type === ENodeTypes.Department) {
-            this.store.dispatch(removeDepartment({ _id: node._id }))
+            this.store.dispatch(DataActions.removeDepartment({ _id: node._id }))
         }
     }
 

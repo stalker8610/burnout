@@ -7,7 +7,7 @@ import * as dataSelectors from 'src/app/store/data/data.selectors';
 import { SelfMood } from '@models/survey.model';
 import { getTeam } from 'src/app/store/data/data.selectors';
 import { concatRespondentName } from 'src/app/store/data/data.util';
-import { loadRequested } from 'src/app/store/data/data.actions';
+import { DataActions } from 'src/app/store/data/data.actions';
 
 @Component({
     selector: 'app-report-wall',
@@ -52,7 +52,7 @@ export class ReportWallComponent implements OnInit {
 
     ngOnInit(): void {
 
-        this.store.dispatch(loadRequested());
+        this.store.dispatch(DataActions.loadRequested());
 
         this.store.select(getAuthorizedUser)
             .pipe(

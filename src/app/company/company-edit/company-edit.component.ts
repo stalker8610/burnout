@@ -1,4 +1,4 @@
-import { addRespondentRequest, loadRequested } from '../../store/data/data.actions';
+import { DataActions, type TNewResponentToCreate } from 'src/app/store/data/data.actions';
 import { getDepartments } from '../../store/data/data.selectors';
 import { Store } from '@ngrx/store';
 import { Component, OnInit } from '@angular/core';
@@ -6,8 +6,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IDepartment } from '@models/department.model';
 import { TWithId } from '@models/common.model';
 import { Observable, of, startWith, map, switchMap, filter } from 'rxjs';
-
-import { TNewResponentToCreate } from '../../store/data/data.actions';
 
 @Component({
     selector: 'app-company-edit',
@@ -27,7 +25,7 @@ export class CompanyEditComponent implements OnInit {
     constructor(private store: Store) { }
 
     ngOnInit() {
-        this.store.dispatch(loadRequested());
+        this.store.dispatch(DataActions.loadRequested());
         this.filteredDepartments$ = this.store.select(getDepartments).pipe(
             filter(departments => !!departments && !!departments.length),
             switchMap(departments => this.formGroup.controls.department.valueChanges.pipe(
@@ -64,7 +62,7 @@ export class CompanyEditComponent implements OnInit {
                 newDepartmentTitle: this.formGroup.controls.department.value!
             })
         }
-        this.store.dispatch(addRespondentRequest({ respondent: newRespondent }));
+        this.store.dispatch(DataActions.addRespondentRequest({ respondent: newRespondent }));
         this.resetForm();
     }
 
