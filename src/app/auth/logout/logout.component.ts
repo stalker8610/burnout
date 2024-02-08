@@ -5,12 +5,10 @@ import { AuthActions } from 'src/app/store/auth/auth.actions';
 
 @Component({
     selector: 'app-logout',
-    template: '<div *ngIf="error$ | async as error">{{error}}</div>',
+    template: '',
     styles: []
 })
 export class LogoutComponent implements OnInit {
-
-    error$ = this.store.select(getLogoutError);
 
     constructor(private store: Store) { }
 
