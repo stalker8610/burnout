@@ -1,12 +1,12 @@
-<form class="login-form">
-    <mat-form-field id="email">
+<form class="login-form" [formGroup]="loginGroup">
+    <mat-form-field>
         <mat-label>Ваш e-mail</mat-label>
-        <input matInput placeholder="my-email@yandex.ru" [formControl]="email">
+        <input matInput placeholder="my-email@yandex.ru" formControlName="email">
     </mat-form-field>
-    <mat-form-field id="password">
+    <mat-form-field>
         <mat-label>Ваш пароль</mat-label>
-        <input matInput placeholder="password" type="password" [formControl]="password">
+        <input matInput placeholder="password" type="password" formControlName="password">
     </mat-form-field>
-    <button mat-stroked-button (click)="auth()" type="button" [disabled]="email.invalid || password.invalid"
+    <button mat-stroked-button (click)="auth()" type="button" [disabled]="!loginGroup.valid"
         color="primary">Войти</button>
 </form>

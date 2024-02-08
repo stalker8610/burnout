@@ -1,11 +1,12 @@
 import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, ValidationErrors, NgForm } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Component, Input, OnInit } from '@angular/core';
-import { take, filter, BehaviorSubject } from 'rxjs';
+import { first, filter, BehaviorSubject } from 'rxjs';
 import { AuthActions } from 'src/app/store/auth/auth.actions';
+import { isNotNull } from 'src/app/store/util';
 
 import { Store } from '@ngrx/store';
-import { getSignupError, isSignUpSuccessful, isSignupTokenValid } from 'src/app/store/auth/auth.selectors';
+import { isSignUpSuccessful, isSignupTokenValid } from 'src/app/store/auth/auth.selectors';
 
 @Component({
     selector: 'app-signup',
@@ -19,10 +20,7 @@ export class SignupComponent implements OnInit {
     hide = true;
     isSignupTokenValid = this.store.select(isSignupTokenValid)
     isSignUpSuccessful = this.store.select(isSignUpSuccessful)
-    signUpError = this.store.select(getSignupError)
-    inProcess = new BehaviorSubject<boolean>(false);
-
-
+    inProcess = new BehaviorSubject<boolean>(true);
     passwordGroup = new FormGroup({
         password: new FormControl('', { validators: [Validators.required, Validators.minLength(4)] }),
         passwordConfirm: new FormControl(''),
@@ -41,15 +39,12 @@ export class SignupComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.inProcess.next(true);
-
         this.store.dispatch(AuthActions.validateToken({ token: this.token }));
         this.store.select(isSignupTokenValid)
             .pipe(
-                filter(value => !!value),
-                take(1)
-            )
-            .subscribe(() => this.inProcess.next(false))
+                first(isNotNull),
+                filter(valid => valid)
+            ).subscribe(() => this.inProcess.next(false))
     }
 
     signUp() {
@@ -58,10 +53,9 @@ export class SignupComponent implements OnInit {
         this.store.dispatch(AuthActions.signup({ token: this.token, password }));
         this.store.select(isSignUpSuccessful)
             .pipe(
-                filter(value => !value),
-                take(1)
-            )
-            .subscribe(() => this.inProcess.next(false))
+                first(isNotNull),
+                filter(valid => !valid)
+            ).subscribe(() => this.inProcess.next(false))
     }
 
     getPasswordErrorMessage(): string {

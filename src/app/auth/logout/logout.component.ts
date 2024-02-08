@@ -1,4 +1,3 @@
-import { getLogoutError } from '../../store/auth/auth.selectors';
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AuthActions } from 'src/app/store/auth/auth.actions';

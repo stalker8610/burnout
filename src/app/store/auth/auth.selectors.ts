@@ -6,16 +6,6 @@ const featureKey = 'auth';
 interface FeatureState extends IState { }
 const selectFeature = createFeatureSelector<FeatureState>(featureKey);
 
-export const getLoginError = createSelector(
-    selectFeature,
-    (state: IState) => state.error
-)
-
-export const getLogoutError = createSelector(
-    selectFeature,
-    (state: IState) => state.error
-)
-
 export const requestDone = createSelector(
     selectFeature,
     (state: IState) => state.getMeRequestDone
@@ -31,22 +21,7 @@ export const getAuthorizedUserName = createSelector(
     (user) => user?.respondent && concatRespondentName(user.respondent) || ''
 )
 
-export const getTokenValidationError = createSelector(
-    selectFeature,
-    (state: IState) => state.error
-)
-
-export const getSignupError = createSelector(
-    selectFeature,
-    (state: IState) => state.error
-)
-
 export const isSignupTokenValid = createSelector(
-    selectFeature,
-    (state: IState) => state.isTokenValid
-)
-
-export const getSignupToken = createSelector(
     selectFeature,
     (state: IState) => state.isTokenValid
 )

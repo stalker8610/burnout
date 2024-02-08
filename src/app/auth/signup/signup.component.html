@@ -2,7 +2,7 @@
     <mat-form-field>
         <input matInput placeholder="Укажите пароль" formControlName="password" [type]="hide ? 'password' 
         : 'text'">
-        <mat-icon matSuffix (click)="changePasswordVisibility()" [class.disabled-icon]="inProcess.getValue()">
+        <mat-icon matSuffix (click)="changePasswordVisibility()" [class.disabled-icon]="inProcess | async">
             {{hide ? 'visibility' :'visibility_off'}}
         </mat-icon>
         <mat-error *ngIf="hasPasswordError()">
@@ -18,10 +18,4 @@
     </mat-form-field>
     <button mat-stroked-button (click)="signUp()" type="button" [disabled]="!passwordGroup.touched || hasPasswordError() || hasConfirmError()"
         color="primary">Зарегистрироваться</button>
-    <!-- <div *ngIf="isSignUpSuccessful | async" class="signup success">
-        Регистрация успешно завершена
-    </div> -->
-    <!-- <div *ngIf="(signUpError | async) as error" class="signup error">
-        {{error}}
-    </div> -->
 </form>

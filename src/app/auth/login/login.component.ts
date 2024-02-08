@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AuthActions } from 'src/app/store/auth/auth.actions';
 
@@ -10,13 +10,16 @@ import { AuthActions } from 'src/app/store/auth/auth.actions';
 })
 export class LoginComponent {
 
-    email = new FormControl('', { validators: [Validators.required, Validators.email] });
-    password = new FormControl('', { validators: [Validators.required] });
+    loginGroup = new FormGroup({
+        email: new FormControl('', { validators: [Validators.required, Validators.email] }),
+        password: new FormControl('', { validators: [Validators.required] })
+    })
 
     constructor(private store: Store) { }
 
     auth() {
-        this.store.dispatch(AuthActions.login({ email: this.email.value as string, password: this.password.value as string }));
+        const { email, password } = this.loginGroup.getRawValue() as { email: string, password: string };
+        this.store.dispatch(AuthActions.login({ email, password }));
     }
 
 }
