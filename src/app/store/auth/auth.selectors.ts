@@ -1,5 +1,6 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { IState } from './auth.reducer';
+import { concatRespondentName } from '../data/data.util';
 
 const featureKey = 'auth';
 interface FeatureState extends IState { }
@@ -23,6 +24,11 @@ export const requestDone = createSelector(
 export const getAuthorizedUser = createSelector(
     selectFeature,
     (state: IState) => state.authorizedUser
+)
+
+export const getAuthorizedUserName = createSelector(
+    getAuthorizedUser,
+    (user) => user?.respondent && concatRespondentName(user.respondent) || ''
 )
 
 export const getTokenValidationError = createSelector(
