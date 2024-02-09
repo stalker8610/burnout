@@ -1,71 +1,55 @@
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { LoginStatusComponent } from './login-status.component';
-import { AppModule } from 'src/app/app.module';
-import { getAuthorizedUser, getAuthorizedUserName } from 'src/app/store/auth/auth.selectors';
-import { MemoizedSelector } from '@ngrx/store';
 
-let store: MockStore;
 let fixture: ComponentFixture<LoginStatusComponent>;
-
-let userSelector: MemoizedSelector<any, any, any>,
-    userNameSelector: MemoizedSelector<any, any, any>;
+let component: LoginStatusComponent;
 
 describe('login-status-component test', () => {
-    beforeEach(async () => {
 
-        await TestBed.configureTestingModule({
-            imports: [AppModule],
-            declarations: [LoginStatusComponent],
-            providers: [
-                provideMockStore(),
-            ]
-        }).compileComponents();
-
-        store = TestBed.inject(MockStore);
+    beforeEach(() => {
+        TestBed.configureTestingModule({ imports: [BrowserAnimationsModule, LoginStatusComponent] })
         fixture = TestBed.createComponent(LoginStatusComponent);
-
-        userSelector = store.overrideSelector(getAuthorizedUser, null);
-        userNameSelector = store.overrideSelector(getAuthorizedUserName, '');
-
+        component = fixture.componentInstance;
     })
 
     it('should create', () => {
         expect(fixture.componentInstance).toBeDefined();
     })
 
-    it('displays "log in" when no user authorized', () => {
+    it('sets defaults to inputs', () => {
+        fixture.detectChanges();
+        expect(component.authorized).toBeFalse();
+        expect(component.userName).toBe('');
+    })
 
+    it('displays "log in" if no authorized user', () => {
+
+        component.authorized = false;
         fixture.detectChanges();
 
-        const loginLink = fixture.debugElement.query(By.css('a[href="/login"]'));
+        const loginLink = fixture.nativeElement.querySelector('a[href="/login"]');
         expect(loginLink).withContext('login link exists').toBeDefined();
 
-        const logoutLink = fixture.debugElement.query(By.css('a[href="/logout"]'));
+        const logoutLink = fixture.nativeElement.querySelector('a[href="/logout"]');
         expect(logoutLink).withContext('logout link do not exist').toBeNull();
 
     })
 
-    it('displays "log out" and user name when user is authorized', () => {
+    it('displays "log out" and user name for authorized user', () => {
 
-        const mockUser = {};
-        const mockUserName = 'Some User Name'
-
-        userSelector.setResult(mockUser);
-        userNameSelector.setResult(mockUserName);
-
-        store.refreshState();
+        component.authorized = true;
+        component.userName = 'Some User Name';
         fixture.detectChanges();
 
-        const loginLink = fixture.debugElement.query(By.css('a[href="/login"]'));
+        const loginLink = fixture.nativeElement.querySelector('a[href="/login"]');
         expect(loginLink).withContext('login link do not exist').toBeNull();
 
-        const logoutLink = fixture.debugElement.query(By.css('a[href="/logout"]'));
+        const logoutLink = fixture.nativeElement.querySelector('a[href="/logout"]');
         expect(logoutLink).withContext('logout link exists').toBeDefined();
 
-        const nameSpan = fixture.debugElement.query(By.css('span'));
-        expect(nameSpan.nativeElement.textContent).withContext('display user name').toContain(mockUserName);
+        const nameSpan = fixture.nativeElement.querySelector('span');
+        expect(nameSpan.textContent).withContext('display user name').toContain(component.userName);
 
     })
 })

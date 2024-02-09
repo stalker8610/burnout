@@ -28,9 +28,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { AppRoutingModule } from './routing/router.module';
 
 import { AppComponent } from './app.component';
-import { LoginComponent } from './auth/login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { SignupComponent } from './auth/signup/signup.component';
 import { HomeComponent } from './home/home.component';
 import { QuestionCardContainerComponent } from './cards/question-card-container/question-card-container.component';
 import { QuestionCardWallComponent } from './cards/question-card-wall/question-card-wall.component';
@@ -44,7 +42,6 @@ import { ReportWallComponent } from './reports/report-wall/report-wall.component
 import { CompanyComponent } from './company/company.component';
 import { CompanyTreeComponent } from './company/company-tree/company-tree.component';
 import { LogoutComponent } from './auth/logout/logout.component';
-import { LoginStatusComponent } from './auth/login-status/login-status.component';
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -99,14 +96,13 @@ import { ReportCompanyScoresComponent } from './reports/report-company/report-co
 import { ReportPersonalComponent } from './reports/report-personal/report-personal.component';
 import { ReportPersonalEfficiencyComponent } from './reports/report-personal/report-personal-efficiency/report-personal-efficiency.component';
 import { ReportPersonalSkillsComponent } from './reports/report-personal/report-personal-skills/report-personal-skills.component';
+import { LoginStatusContainerComponent } from './auth/login-status/login-status-container.component';
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        LoginComponent,
         NotFoundComponent,
-        SignupComponent,
         HomeComponent,
         QuestionCardContainerComponent,
         QuestionCardWallComponent,
@@ -119,8 +115,6 @@ import { ReportPersonalSkillsComponent } from './reports/report-personal/report-
         ReportWallComponent,
         CompanyComponent,
         CompanyTreeComponent,
-        LogoutComponent,
-        LoginStatusComponent,
         CompanyEditComponent,
         RespondentComponent,
         DepartmentComponent,
@@ -177,7 +171,9 @@ import { ReportPersonalSkillsComponent } from './reports/report-personal/report-
             reportPersonalSkillsEffects,
             messagableEffects),
         StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
-        NgChartsModule
+        NgChartsModule,
+        LoginStatusContainerComponent,
+        LogoutComponent,
     ],
     providers: [
         {

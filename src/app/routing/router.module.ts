@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, provideRouter, withComponentInputBinding } from '@angular/router';
 
-import { LoginComponent } from '../auth/login/login.component';
 import { HomeComponent } from '../home/home.component';
 import { NotFoundComponent } from '../not-found/not-found.component';
-import { SignupComponent } from '../auth/signup/signup.component';
 import { SurveyComponent } from '../survey/survey.component';
 import { ReportWallComponent } from '../reports/report-wall/report-wall.component';
 import { CompanyComponent } from '../company/company.component';
@@ -16,8 +14,17 @@ import { ReportPersonalComponent } from '../reports/report-personal/report-perso
 
 
 const routes: Routes = [
-    { path: 'signup/:token', canActivate: [isNotAuthorizedGuard], component: SignupComponent, pathMatch: 'full' },
-    { path: 'login', canActivate: [isNotAuthorizedGuard], component: LoginComponent, pathMatch: 'full' },
+    {
+        path: 'signup/:token',
+        canActivate: [isNotAuthorizedGuard],
+        loadComponent: () => import('../auth/signup/signup-container.component').then(module => module.SignupContainerComponent),
+        pathMatch: 'full'
+    },
+    {
+        path: 'login', canActivate: [isNotAuthorizedGuard],
+        loadComponent: () => import('../auth/login/login-containter.component').then(module => module.LoginContainerComponent),
+        pathMatch: 'full'
+    },
     { path: 'logout', canActivate: [isAuthorizedGuard], component: LogoutComponent, pathMatch: 'full' },
     { path: 'survey/:surveyId', canActivate: [isAuthorizedGuard], component: SurveyComponent, pathMatch: 'full' },
 

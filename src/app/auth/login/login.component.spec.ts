@@ -1,51 +1,34 @@
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from "./login.component"
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { Store } from "@ngrx/store";
-import { AuthActions } from "src/app/store/auth/auth.actions";
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { MatFormFieldHarness } from '@angular/material/form-field/testing';
-import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatInputHarness } from '@angular/material/input/testing';
-import { AppModule } from "src/app/app.module";
+import { first } from 'rxjs';
 
 describe('login-component test', () => {
 
+    const mockData = {
+        email: 'email@gmail.com',
+        password: 'mockPassword'
+    }
+
     describe('component class tests', () => {
 
-        let store: jasmine.SpyObj<Store>;
+        let component: LoginComponent;
 
         beforeEach(() => {
-            const mockStore = jasmine.createSpyObj('Store', ['dispatch']);
-            TestBed.configureTestingModule({
-                providers: [
-                    {
-                        provide: Store,
-                        useValue: mockStore
-                    }
-                ]
-            })
-
-            store = TestBed.inject(Store) as jasmine.SpyObj<Store>;
+            TestBed.configureTestingModule({ imports: [LoginComponent] })
+            component = new LoginComponent();
         })
 
-        it('opened with empty fields', () => {
-            const comp = new LoginComponent(store);
-            expect(comp.email.value).withContext('Email is empty').toBe('');
-            expect(comp.password.value).withContext('Password is empty').toBe('');
+        it('initiated with empty fields', () => {
+            expect(component.loginGroup.controls.email.value).withContext('Email is empty').toBe('');
+            expect(component.loginGroup.controls.password.value).withContext('Password is empty').toBe('');
         })
 
-        it('dispatches #AuthActions.login action when login', () => {
-            const comp = new LoginComponent(store);
-
-            const email = 'mockEmail';
-            const password = 'mockPassword';
-
-            comp.email.setValue(email);
-            comp.password.setValue(password);
-            comp.auth();
-            expect(store.dispatch.calls.count()).toBe(1);
-            expect(store.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({ type: AuthActions.login.type, email, password }));
+        it('emits #login event with email and password when login() called', () => {
+            component.loginGroup.setValue(mockData);
+            component.loginEvent.pipe(first())
+                .subscribe(authData => expect(authData).toEqual(mockData))
+            component.login();
         })
     })
 
@@ -53,54 +36,59 @@ describe('login-component test', () => {
 
         let component: LoginComponent;
         let fixture: ComponentFixture<LoginComponent>;
-        let loader: HarnessLoader;
 
-        beforeEach(async () => {
-            await TestBed.configureTestingModule({ imports: [AppModule], declarations: [LoginComponent] })
-                .compileComponents();
+        beforeEach(() => {
+            TestBed.configureTestingModule({ imports: [BrowserAnimationsModule, LoginComponent] });
             fixture = TestBed.createComponent(LoginComponent);
             component = fixture.componentInstance;
-            loader = TestbedHarnessEnvironment.loader(fixture);
         })
 
         it('should create', () => {
             expect(component).toBeDefined();
         });
 
-        it('includes 2 input fields for email and password', async () => {
-            const fields = await loader.getAllHarnesses(MatFormFieldHarness);
-            expect(fields.length).toBe(2);
+        it('includes input fields for email and password and button to login', () => {
+
+            const emailInput = fixture.nativeElement.querySelector('input[formControlName=email]');
+            expect(emailInput).withContext('email input found').toBeDefined();
+
+            const passwordInput = fixture.nativeElement.querySelector('input[formControlName=password]');
+            expect(passwordInput).withContext('password input found').toBeDefined();
+
+            const btn = fixture.nativeElement.querySelector('button');
+            expect(btn).withContext('button exist').toBeDefined();
+
         })
 
-        it('doesn\'t allow to login when fields are invalid', async () => {
-            const emailField = await loader.getHarness(MatFormFieldHarness.with({ selector: '#email' }));
-            expect(await emailField.isControlValid()).toBe(false);
+        it('button click calls login()', async () => {
+            spyOn(component, 'login');
+            const btn = fixture.nativeElement.querySelector('button');
+            btn.click();
+            fixture.whenStable().then(() => {
+                expect(component.login).toHaveBeenCalled();
+            });
+        })
 
-            const passwordField = await loader.getHarness(MatFormFieldHarness.with({ selector: '#password' }));
-            expect(await passwordField.isControlValid()).toBe(false);
+        it('doesn\'t allow to login when fields are invalid', () => {
 
-            const btn = await loader.getHarness(MatButtonHarness)
-            expect(await btn.isDisabled()).toBe(true);
+            expect(component.loginGroup.controls.email.valid).withContext('empty email control is invalid').toBe(false);
+            expect(component.loginGroup.controls.password.valid).withContext('empty password control is invalid').toBe(false);
+
+            fixture.detectChanges();
+            const btn = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+            expect(btn.disabled).toBe(true);
+
         })
 
         it('allows to login when fields are valid', async () => {
+            component.loginGroup.setValue(mockData);
 
-            const btn = await loader.getHarness(MatButtonHarness);
+            expect(component.loginGroup.controls.email.valid).withContext('empty email control is valid').toBe(true);
+            expect(component.loginGroup.controls.password.valid).withContext('empty password control is valid').toBe(true);
 
-            const emailField = await loader.getHarness(MatFormFieldHarness.with({ selector: '#email' }));
-            expect(emailField).toBeDefined();
-            const emailControl = await emailField.getControl() as MatInputHarness;
-            await emailControl.setValue('mock@email.ru');
-            expect(await emailField.isControlValid()).toBe(true);
-
-            const passwordField = await loader.getHarness(MatFormFieldHarness.with({ selector: '#password' }));
-            expect(passwordField).toBeDefined();
-            const passwordControl = await passwordField.getControl() as MatInputHarness;
-            await passwordControl.setValue('mock-password');
-            expect(await passwordField.isControlValid()).toBe(true);
-
-            expect(await btn.isDisabled()).toBe(false);
-
+            fixture.detectChanges();
+            const btn = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+            expect(btn.disabled).toBe(false);
         })
 
     })

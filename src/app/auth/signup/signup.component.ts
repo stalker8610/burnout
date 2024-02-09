@@ -1,26 +1,35 @@
-import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, ValidationErrors, NgForm } from '@angular/forms';
+import { Validators, FormControl, ValidatorFn, AbstractControl, FormGroup, ValidationErrors, NgForm, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { Component, Input, OnInit } from '@angular/core';
-import { first, filter, BehaviorSubject } from 'rxjs';
-import { AuthActions } from 'src/app/store/auth/auth.actions';
-import { isNotNull } from 'src/app/store/util';
+import { Component, Input, Output, ChangeDetectionStrategy, OnChanges } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 
-import { Store } from '@ngrx/store';
-import { isSignUpSuccessful, isSignupTokenValid } from 'src/app/store/auth/auth.selectors';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-signup',
     templateUrl: './signup.component.html',
-    styleUrls: ['./signup.component.scss']
+    styleUrls: ['./signup.component.scss'],
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatButtonModule,
+        MatInputModule,
+        MatIconModule,
+        NgIf],
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnChanges {
 
-    @Input() token: string = '';
+    @Input() blockInterface = false;
+    @Output('signup') signUpEvent = new EventEmitter<string>();
 
-    hide = true;
-    isSignupTokenValid = this.store.select(isSignupTokenValid)
-    isSignUpSuccessful = this.store.select(isSignUpSuccessful)
-    inProcess = new BehaviorSubject<boolean>(true);
+    showPassword = false;
     passwordGroup = new FormGroup({
         password: new FormControl('', { validators: [Validators.required, Validators.minLength(4)] }),
         passwordConfirm: new FormControl(''),
@@ -28,34 +37,16 @@ export class SignupComponent implements OnInit {
 
     errorMatcher = new MyErrorStateMatcher();
 
-    constructor(private readonly store: Store) {
-        this.inProcess.subscribe(value => {
-            if (value) {
-                this.passwordGroup.disable();
-            } else {
-                this.passwordGroup.enable();
-            }
-        })
-    }
-
-    ngOnInit(): void {
-        this.store.dispatch(AuthActions.validateToken({ token: this.token }));
-        this.store.select(isSignupTokenValid)
-            .pipe(
-                first(isNotNull),
-                filter(valid => valid)
-            ).subscribe(() => this.inProcess.next(false))
+    ngOnChanges() {
+        if (this.blockInterface) {
+            this.passwordGroup.disable();
+        } else {
+            this.passwordGroup.enable();
+        }
     }
 
     signUp() {
-        this.inProcess.next(true);
-        const password = this.passwordGroup.controls.password.value!;
-        this.store.dispatch(AuthActions.signup({ token: this.token, password }));
-        this.store.select(isSignUpSuccessful)
-            .pipe(
-                first(isNotNull),
-                filter(valid => !valid)
-            ).subscribe(() => this.inProcess.next(false))
+        this.signUpEvent.emit(this.passwordGroup.getRawValue().password as string);
     }
 
     getPasswordErrorMessage(): string {
@@ -81,8 +72,8 @@ export class SignupComponent implements OnInit {
     }
 
     changePasswordVisibility() {
-        if (!this.inProcess.getValue()) {
-            this.hide = !this.hide;
+        if (!this.blockInterface) {
+            this.showPassword = !this.showPassword;
         }
     }
 

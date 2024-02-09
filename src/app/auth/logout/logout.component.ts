@@ -5,7 +5,7 @@ import { AuthActions } from 'src/app/store/auth/auth.actions';
 @Component({
     selector: 'app-logout',
     template: '',
-    styles: []
+    standalone: true
 })
 export class LogoutComponent implements OnInit {
 

@@ -1,7 +1,7 @@
-<ng-container *ngIf="userAuthorized | async as userAuthorized; else loginBlock">
+<ng-container *ngIf="authorized; else loginBlock">
     <div>
         <span class="unselectable">
-            {{userName | async}}
+            {{userName}}
         </span>
         <a mat-button href="/logout">
             <mat-icon>logout</mat-icon>

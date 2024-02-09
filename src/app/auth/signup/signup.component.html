@@ -1,9 +1,8 @@
 <form [formGroup]="passwordGroup" class="signup-form">
     <mat-form-field>
-        <input matInput placeholder="Укажите пароль" formControlName="password" [type]="hide ? 'password' 
-        : 'text'">
-        <mat-icon matSuffix (click)="changePasswordVisibility()" [class.disabled-icon]="inProcess | async">
-            {{hide ? 'visibility' :'visibility_off'}}
+        <input matInput placeholder="Укажите пароль" formControlName="password" [type]="showPassword ? 'text': 'password'">
+        <mat-icon matSuffix (click)="changePasswordVisibility()" [class.disabled-icon]="blockInterface">
+            {{showPassword ? 'visibility' : 'visibility_off' }}
         </mat-icon>
         <mat-error *ngIf="hasPasswordError()">
             {{getPasswordErrorMessage()}}
@@ -16,6 +15,7 @@
             {{getConfirmErrorMessage()}}
         </mat-error>
     </mat-form-field>
-    <button mat-stroked-button (click)="signUp()" type="button" [disabled]="!passwordGroup.touched || hasPasswordError() || hasConfirmError()"
+    <button mat-stroked-button (click)="signUp()" type="button"
+        [disabled]="!passwordGroup.touched || hasPasswordError() || hasConfirmError() || blockInterface"
         color="primary">Зарегистрироваться</button>
 </form>

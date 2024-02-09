@@ -1,5 +1,6 @@
-import { createSelector, createFeatureSelector } from '@ngrx/store';
+import { createSelector, createFeatureSelector, Store } from '@ngrx/store';
 import { IState } from './auth.reducer';
+import { map } from 'rxjs';
 import { concatRespondentName } from '../data/data.util';
 
 const featureKey = 'auth';
@@ -15,6 +16,10 @@ export const getAuthorizedUser = createSelector(
     selectFeature,
     (state: IState) => state.authorizedUser
 )
+
+export const isUserAuthorized = (store: Store) =>
+    store.select(getAuthorizedUser)
+        .pipe(map(value => !!value))
 
 export const getAuthorizedUserName = createSelector(
     getAuthorizedUser,

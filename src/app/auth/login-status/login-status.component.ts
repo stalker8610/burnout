@@ -1,17 +1,19 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { getAuthorizedUser, getAuthorizedUserName } from 'src/app/store/auth/auth.selectors';
+import { NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-login-status',
     templateUrl: './login-status.component.html',
-    styleUrls: ['./login-status.component.scss']
+    styleUrls: ['./login-status.component.scss'],
+    standalone: true,
+    imports: [MatButtonModule, MatIconModule, NgIf],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginStatusComponent {
 
-    userAuthorized = this.store.select(getAuthorizedUser);
-    userName = this.store.select(getAuthorizedUserName);
-
-    constructor(private store: Store) { }
+    @Input() userName = '';
+    @Input() authorized = false;
 
 }
