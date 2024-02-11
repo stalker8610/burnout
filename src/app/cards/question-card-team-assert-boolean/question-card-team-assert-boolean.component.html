@@ -2,13 +2,10 @@
     <input matInput placeholder="Введите имя или фамилию сотрудника" [formControl]="filter">
 </mat-form-field>
 <div class="collection">
-    <!-- <div class="spinner" *ngIf="!filteredTeam.value">
-        <mat-progress-spinner mode="indeterminate" diameter="50" strokeWidth="2" color="accent"></mat-progress-spinner>
-    </div> -->
-    <div *ngIf="!filteredTeam.value.length" class="teammate-main" >
+    <div *ngIf="!filteredTeam.length" class="teammate-main" >
         Сотрудники не найдены...
     </div>
-    <div class="teammate" *ngFor="let teammate of filteredTeam.value; index as i">
+    <div class="teammate" *ngFor="let teammate of filteredTeam; index as i">
         <div class="teammate-main">
             <div class="teammate-name">
                 {{teammate.fullName}}

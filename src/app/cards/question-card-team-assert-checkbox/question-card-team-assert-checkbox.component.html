@@ -2,13 +2,10 @@
     <input matInput placeholder="Введите имя или фамилию сотрудника" [formControl]="filter">
 </mat-form-field>
 <div class="collection">
-    <!-- <div class="spinner" *ngIf="!filteredTeam.value">
-        <mat-progress-spinner mode="indeterminate" diameter="50" strokeWidth="2" color="accent"></mat-progress-spinner>
-    </div> -->
-    <div *ngIf="!filteredTeam.value.length" class="teammate-main" >
+    <div *ngIf="!filteredTeam.length" class="teammate-main">
         Сотрудники не найдены...
     </div>
-    <div class="teammate" *ngFor="let teammate of filteredTeam.value">
+    <div class="teammate" *ngFor="let teammate of filteredTeam">
         <mat-checkbox color="primary" (change)="selectionModel.toggle(teammate)"
             [checked]="selectionModel.isSelected(teammate)">
         </mat-checkbox>

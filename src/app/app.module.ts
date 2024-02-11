@@ -31,7 +31,6 @@ import { AppComponent } from './app.component';
 import { QuestionCardContainerComponent } from './cards/question-card-container/question-card-container.component';
 import { QuestionCardWallComponent } from './cards/question-card-wall/question-card-wall.component';
 import { QuestionCardCompanyComponent } from './cards/question-card-company/question-card-company.component';
-import { QuestionDirective } from './cards/question.directive';
 import { SurveyComponent } from './survey/survey.component';
 import { QuestionCardTeamAssertCheckboxComponent } from './cards/question-card-team-assert-checkbox/question-card-team-assert-checkbox.component';
 import { QuestionCardPersonalComponent } from './cards/question-card-personal/question-card-personal.component';
@@ -95,6 +94,7 @@ import { ReportPersonalComponent } from './reports/report-personal/report-person
 import { ReportPersonalEfficiencyComponent } from './reports/report-personal/report-personal-efficiency/report-personal-efficiency.component';
 import { ReportPersonalSkillsComponent } from './reports/report-personal/report-personal-skills/report-personal-skills.component';
 import { LoginStatusContainerComponent } from './auth/login-status/login-status-container.component';
+import { QuestionCardLayoutComponent } from './cards/question-card-layout/question-card-layout.component';
 
 
 @NgModule({
@@ -103,7 +103,6 @@ import { LoginStatusContainerComponent } from './auth/login-status/login-status-
         QuestionCardContainerComponent,
         QuestionCardWallComponent,
         QuestionCardCompanyComponent,
-        QuestionDirective,
         SurveyComponent,
         QuestionCardTeamAssertCheckboxComponent,
         QuestionCardPersonalComponent,
@@ -170,6 +169,7 @@ import { LoginStatusContainerComponent } from './auth/login-status/login-status-
         NgChartsModule,
         LoginStatusContainerComponent,
         LogoutComponent,
+        QuestionCardLayoutComponent,
     ],
     providers: [
         {

@@ -8,7 +8,7 @@
         </div>
     </div>
     <div class="newcomer">
-        <mat-checkbox labelPosition="before" [(ngModel)]="newcomer" (change)="updateEmptyAnswerState()">Мало пересекаемся по работе</mat-checkbox>
+        <mat-checkbox labelPosition="before" [(ngModel)]="newcomer" (change)="checkEmptyAnswer()">Мало пересекаемся по работе</mat-checkbox>
     </div>
 </div>
 <div class="emotions" [class.disabled]="newcomer">
@@ -23,6 +23,6 @@
 <div class="textarea" [class.disabled]="newcomer">
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <textarea matInput [(ngModel)]="text" [style]="{resize: 'none'}" cdkTextareaAutosize cdkAutosizeMaxRows="4"
-            cdkAutosizeMinRows="4" (change)="updateEmptyAnswerState()"></textarea>
+            cdkAutosizeMinRows="4" (change)="checkEmptyAnswer()" (keyup)="checkEmptyAnswer"></textarea>
     </mat-form-field>
 </div>

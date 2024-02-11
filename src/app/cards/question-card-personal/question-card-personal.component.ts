@@ -1,9 +1,8 @@
-import { QuestionComponent } from '../question.interface';
+import { EmptyStateEmitable, IQuestionComponent } from '../question.interface';
 import { Component, Input, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { trigger, transition, animate, style, state } from '@angular/animations';
-import { BehaviorSubject } from 'rxjs';
-import { TeammateFeedbackQuestionInputData } from 'src/app/survey/survey.component';
+import { TeammateFeedbackQuestionInputData } from '../question.interface';
 import { PersonalFeedbackMood, TAnswerPersonal } from '@models/survey.model';
 import { getPersonalFeedbackView } from 'src/app/store/data/data.util';
 
@@ -28,12 +27,48 @@ import { getPersonalFeedbackView } from 'src/app/store/data/data.util';
         ]),
     ]
 })
-export class QuestionCardPersonalComponent implements QuestionComponent, OnInit {
+export class QuestionCardPersonalComponent extends EmptyStateEmitable implements IQuestionComponent, OnInit {
 
     @Input() inputData!: TeammateFeedbackQuestionInputData;
-
-    emptyAnswer = new BehaviorSubject<boolean>(true);
     newcomer = false;
+    selectionModel = new SelectionModel<PersonalFeedbackMood>(false)
+    text = '';
+
+    ngOnInit() {
+        this.selectionModel.changed.subscribe(() => this.checkEmptyAnswer());
+    }
+
+    getState(mood: PersonalFeedbackMood) {
+        return this.selectionModel.isSelected(mood) ? 'checked' : 'unchecked'
+    }
+
+    isAnswerEmpty(): boolean {
+        return !this.selectionModel.selected.length && !this.text.trim().length && !this.newcomer;
+    }
+
+    get answer(): TAnswerPersonal {
+        let result: TAnswerPersonal;
+        if (this.newcomer) {
+            result = {
+                feedbackTo: this.inputData.teammate._id,
+                newcomer: true
+            }
+        } else {
+            result = {
+                feedbackTo: this.inputData.teammate._id,
+            };
+
+            const text = this.text.trim();
+            if (text.length) {
+                result.text = text;
+            }
+
+            if (this.selectionModel.selected.length) {
+                result.mood = this.selectionModel.selected[0];
+            }
+        }
+        return result;
+    }
 
     moods = [
         {
@@ -62,48 +97,4 @@ export class QuestionCardPersonalComponent implements QuestionComponent, OnInit 
             label: getPersonalFeedbackView(PersonalFeedbackMood.Happiest)
         },
     ]
-
-    selectionModel = new SelectionModel<PersonalFeedbackMood>(false)
-    //selectionModel = new SelectionModel<PersonalFeedbackMood>(false, [PersonalFeedbackMood.Happy])
-
-    text = '';
-
-    ngOnInit() {
-        this.selectionModel.changed.subscribe(() => {
-            this.updateEmptyAnswerState();
-        })
-    }
-
-    getState(mood: PersonalFeedbackMood) {
-        return this.selectionModel.isSelected(mood) ? 'checked' : 'unchecked'
-    }
-
-    confirmAnswer(): TAnswerPersonal {
-        let result: TAnswerPersonal;
-        if (this.newcomer) {
-            result = {
-                feedbackTo: this.inputData.teammate._id,
-                newcomer: true
-            }
-        } else {
-            result = {
-                feedbackTo: this.inputData.teammate._id,
-                //mood: this.selectionModel.selected[0]
-            };
-            if (this.text.trim().length) {
-                result.text = this.text.trim();
-            }
-
-            if (this.selectionModel.selected.length) {
-                result.mood = this.selectionModel.selected[0];
-            }
-        }
-        return result;
-    }
-
-    updateEmptyAnswerState() {
-        const emptyAnswer = !this.selectionModel.selected.length && !this.text.trim().length && !this.newcomer;
-        this.emptyAnswer.next(emptyAnswer);
-    }
-
 }

@@ -2,7 +2,7 @@ import { createEffect } from "@ngrx/effects"
 import { Actions, ofType } from "@ngrx/effects"
 import { SurveyActions } from './survey.actions'
 import { concatLatestFrom } from "@ngrx/effects"
-import { map, catchError, exhaustMap, of, filter, tap } from "rxjs"
+import { map, catchError, exhaustMap, of, filter } from "rxjs"
 import { inject } from '@angular/core'
 import { Store } from "@ngrx/store"
 import { getCurrentQuestionIndex, getLoaded, getSurvey } from "./survey.selectors"
@@ -62,7 +62,6 @@ export const confirmAnswer$ = createEffect(
     (actions$ = inject(Actions), surveyService = inject(SurveyService), store = inject(Store)) =>
         actions$.pipe(
             ofType(SurveyActions.answerConfirmed),
-
             exhaustMap(action => surveyService.confirmAnswer(action.surveyId, action.answer).pipe(
                 map(() => SurveyActions.operationCompletedSuccessful()),
                 catchError(handleError(SurveyActions.operationFailed))
@@ -105,5 +104,4 @@ export const operationCompleteSuccessful$ = createEffect(
         ),
     { functional: true }
 )
-
 

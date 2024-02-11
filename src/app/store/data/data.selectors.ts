@@ -55,12 +55,12 @@ export const getTeamExceptAuthorizedUser = createSelector(
                 ...respondent,
                 department: departments?.find(department => department._id === respondent.departmentId),
                 fullName: concatRespondentName(respondent)
-            }))
+            })) ?? null
 )
 
 export const getTeammateForFeedback = (respondentId: TObjectId<IRespondent>) => createSelector(
     getTeamExceptAuthorizedUser,
-    (team) => team?.find(respondent => respondent._id === respondentId)
+    (team) => team?.find(respondent => respondent._id === respondentId) || null
 )
 
 export const getDepartmentsAndTeam = createSelector(

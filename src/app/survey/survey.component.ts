@@ -11,39 +11,7 @@ import { getAuthorizedUser } from '../store/auth/auth.selectors';
 import { getLoaded, getSurvey } from '../store/survey/survey.selectors';
 import { DataActions } from '../store/data/data.actions';
 
-interface AbstractQuestionInputData {
-    questionId: TObjectId<IQuestion>,
-    title: string,
-}
 
-export interface WallQuestionInputData extends AbstractQuestionInputData { }
-
-export interface CompanyQuestionInputData extends AbstractQuestionInputData {
-    subtitle: string
-}
-
-export interface TeammateFeedbackQuestionInputData extends AbstractQuestionInputData {
-    teammate: TTeammate
-}
-
-export interface TeamAssertBooleanQuestionInputData extends AbstractQuestionInputData {
-    team: TTeammate[]
-}
-
-export interface TeamAssertCheckboxQuestionInputData extends AbstractQuestionInputData {
-    team: TTeammate[]
-}
-
-export type QuestionInputData =
-    WallQuestionInputData |
-    CompanyQuestionInputData |
-    TeammateFeedbackQuestionInputData |
-    TeamAssertBooleanQuestionInputData |
-    TeamAssertCheckboxQuestionInputData
-
-export class QuestionItem {
-    constructor(public component: Type<any>, public data: QuestionInputData) { }
-}
 
 @Component({
     selector: 'app-survey',

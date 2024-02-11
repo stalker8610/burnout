@@ -4,6 +4,6 @@
 <div class="textarea">
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <textarea matInput [(ngModel)]="text" [style]="{resize: 'none'}" cdkTextareaAutosize cdkAutosizeMaxRows="6"
-            cdkAutosizeMinRows="6" (change)="updateEmptyAnswerState()"></textarea>
+            cdkAutosizeMinRows="6" (change)="checkEmptyAnswer()" (keyup)="checkEmptyAnswer()"></textarea>
     </mat-form-field>
 </div>

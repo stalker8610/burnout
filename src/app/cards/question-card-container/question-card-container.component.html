@@ -1,27 +1,5 @@
-<div class="host-container" [class.disabled]="blockInterface | async">
-    <div class="header">
-        <div class="title">
-            <div *ngIf="subtitle" class="subtitle">
-                {{subtitle}}
-            </div>
-            <div>
-                {{title || subtitle}}
-            </div>
-        </div>
-        <div class="index">
-            {{(currentQuestionIndex | async)! + 1}} из {{questionsAmount}}
-        </div>
-    </div>
-    <div class="container">
-        <ng-template questionHost (touched)="onTouched($event)"></ng-template>
-    </div>
-    <div class="actions">
-        <mat-checkbox class="example-margin" [(ngModel)]="anonymous" color="primary">Опубликовать
-            анонимно</mat-checkbox>
-        <div>
-            <!-- <button mat-stroked-button color="primary" (click)="stepBack()">Назад</button> -->
-            <button *ngIf="emptyAnswer" mat-stroked-button color="primary" (click)="skipAnswer()">Пропустить</button>
-            <button *ngIf="!emptyAnswer" mat-stroked-button color="primary" (click)="confirmAnswer()">Далее</button>
-        </div>
-    </div>
-</div>
+<app-question-card-layout [title]="title" [subtitle]="subtitle"
+    [currentQuestionIndex]="(currentQuestionIndex | async) ?? 0" [questionsAmount]="questionsAmount"
+    [componentType]="questionCardComponentType" [questionData]="questionData"
+    [blockInterface]="(blockInterface | async) ?? false" (skipEvent)="onSkip()" (confirmEvent)="onConfirm($event)">
+</app-question-card-layout>

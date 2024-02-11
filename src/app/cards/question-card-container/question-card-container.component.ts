@@ -1,10 +1,7 @@
-import { Component, Input, ViewChild, ComponentRef, OnInit } from '@angular/core';
-import { QuestionDirective } from '../question.directive';
-import { QuestionComponent } from '../question.interface';
+import { Component, Input, OnInit, Type } from '@angular/core';
 
-import { distinctUntilChanged, map, filter, combineLatest } from 'rxjs';
-import { QuestionItem } from '../../survey/survey.component';
-import { TObjectId, TWithId } from '@models/common.model';
+import { map, filter, combineLatest } from 'rxjs';
+import { TObjectId } from '@models/common.model';
 import { EOperationStatus, IQuestion, TQuestionConfirmedAnswer } from '@models/survey.model';
 import { ISurvey } from '@models/survey.model';
 import { Store } from '@ngrx/store';
@@ -20,12 +17,23 @@ import { QuestionCardTeamAssertCheckboxComponent } from '../question-card-team-a
 import { QuestionCardPersonalComponent } from '../question-card-personal/question-card-personal.component';
 import { QuestionCardTeamAssertBooleanComponent } from '../question-card-team-assert-boolean/question-card-team-assert-boolean.component';
 import { IRespondent } from '@models/respondent.model';
+import type { TAnswer } from '@models/survey.model';
+import { TQuestionInputData } from '../question.interface';
+import { EQuestionType } from '@models/survey.model';
+import { isNotNull } from 'src/app/store/util';
+
+type CardComponentType = QuestionCardWallComponent
+    | QuestionCardCompanyComponent
+    | QuestionCardTeamAssertCheckboxComponent
+    | QuestionCardPersonalComponent
+    | QuestionCardTeamAssertBooleanComponent
 
 
 @Component({
     selector: 'app-question-card-container',
     templateUrl: './question-card-container.component.html',
-    styleUrls: ['./question-card-container.component.scss']
+    styleUrls: ['./question-card-container.component.scss'],
+
 })
 export class QuestionCardContainerComponent implements OnInit {
 
@@ -36,106 +44,76 @@ export class QuestionCardContainerComponent implements OnInit {
     title = '';
     subtitle = '';
 
-    private componentRef!: ComponentRef<QuestionComponent>;
-
-    @ViewChild(QuestionDirective, { static: true }) questionHost!: QuestionDirective;
-
-    anonymous = false;
-    emptyAnswer = true;
-
     blockInterface = this.store.select(getOperationStatus).pipe(
         map(status => status === EOperationStatus.Pending)
     );
     currentQuestionIndex = this.store.select(getCurrentQuestionIndex);
     currentQuestionId: TObjectId<IQuestion> | null = null;
+    questionCardComponentType: Type<CardComponentType> | null = null;
+    questionData: TQuestionInputData | null = null;
 
     constructor(private store: Store) { }
 
     ngOnInit(): void {
 
         combineLatest([
-            this.store.select(getCurrentQuestion),
+            this.store.select(getCurrentQuestion).pipe(filter(isNotNull)),
             this.store.select(getTeamExceptAuthorizedUser),
-            this.store.select(getTeammateForFeedback(this.feedbackToId))])
-            .pipe(
-                filter(([question, team, teammate]) => !!question && !!team && team.every(teammate => !!teammate.department) && !!teammate),
-            )
+            this.store.select(getTeammateForFeedback(this.feedbackToId))]).pipe(filter(isNotNull))
             .subscribe(([question, team, teammate]) => {
-                this.currentQuestionId = question!._id;
-
-                //clear checkbox
-                this.anonymous = false;
-
-                const questionItem = this.getQuestionData(question!, team as TTeammate[], teammate as TTeammate);
-                const viewContainerRef = this.questionHost.viewContainerRef;
-                viewContainerRef.clear();
-
-                this.componentRef = viewContainerRef.createComponent<QuestionComponent>(questionItem.component);
-                this.componentRef.instance.inputData = questionItem.data;
-                this.componentRef.instance.emptyAnswer?.pipe(distinctUntilChanged()).
-                    subscribe(value => this.emptyAnswer = value);
-
-                this.title = questionItem.data.title ?? '';
-                this.subtitle = 'subtitle' in questionItem.data ? questionItem.data.subtitle : '';
+                this.currentQuestionId = question._id;
+                this.title = this.getQuestionTitle(question); 
+                this.subtitle = this.getQuestionSubtitle(question); 
+                this.questionCardComponentType = this.getQuestionCardComponent(question);
+                this.questionData = this.getQuestionInputData(question!, team as TTeammate[], teammate as TTeammate);
             })
     }
 
-    getQuestionData(question: TWithId<IQuestion>, team: TTeammate[], teammate: TTeammate) {
-
+    private getQuestionCardComponent(question: IQuestion) {
         switch (question.type) {
-            case 'wall': return new QuestionItem(QuestionCardWallComponent,
-                {
-                    questionId: question._id,
-                    title: question.title
-                });
-            case 'personal': return new QuestionItem(QuestionCardPersonalComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    teammate
-                });
-            case 'boolean': return new QuestionItem(QuestionCardTeamAssertBooleanComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    team
-                });
-            case 'checkbox': return new QuestionItem(QuestionCardTeamAssertCheckboxComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    subtitle: 'Выберите, кто из коллег, как правило...',
-                    team
-                });
-            case 'company': return new QuestionItem(QuestionCardCompanyComponent,
-                {
-                    questionId: question._id,
-                    title: question.title,
-                    subtitle: 'Насколько вы согласны со следующим утверждением?',
-                });
+            case EQuestionType.Wall: return QuestionCardWallComponent;
+            case EQuestionType.Pesronal: return QuestionCardPersonalComponent;
+            case EQuestionType.Boolean: return QuestionCardTeamAssertBooleanComponent;
+            case EQuestionType.Checkbox: return QuestionCardTeamAssertCheckboxComponent;
+            case EQuestionType.Company: return QuestionCardCompanyComponent;
             default: throw 'Unknown question type';
         }
     }
 
-    confirmAnswer() {
-        const answer = this.componentRef.instance.confirmAnswer();
+    private getQuestionTitle(question: IQuestion) {
+        return question.title;
+    }
+
+    private getQuestionSubtitle(question: IQuestion): string { 
+        switch (question.type) {
+            case EQuestionType.Checkbox: return 'Выберите, кто из коллег, как правило...';
+            case EQuestionType.Company: return 'Насколько вы согласны со следующим утверждением?';
+            default: return '';
+        }
+    }
+
+    private getQuestionInputData(question: IQuestion, team: TTeammate[], teammate: TTeammate): TQuestionInputData { 
+        switch (question.type) {
+            case EQuestionType.Pesronal: return { teammate };
+            case EQuestionType.Boolean: return { team };
+            case EQuestionType.Checkbox: return { team };
+            default: return {};
+        }
+    }
+
+    onConfirm({ answer, anonymous }: { answer: TAnswer, anonymous: boolean }) {
         const confirmedAnswer: TQuestionConfirmedAnswer = {
             questionId: this.currentQuestionId!,
             answer
         }
-
-        if (this.anonymous) {
+        if (anonymous) {
             confirmedAnswer.anonymous = true;
         }
-
         this.store.dispatch(SurveyActions.answerConfirmed({ surveyId: this.surveyId, answer: confirmedAnswer }))
-
     }
 
-    skipAnswer() {
-        const skipped = {
-            questionId: this.currentQuestionId!
-        }
+    onSkip() {
+        const skipped = { questionId: this.currentQuestionId! }
         this.store.dispatch(SurveyActions.questionSkipped({ surveyId: this.surveyId, skipped }))
     }
 

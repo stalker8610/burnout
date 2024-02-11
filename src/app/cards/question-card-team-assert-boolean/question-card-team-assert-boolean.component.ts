@@ -1,60 +1,50 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { debounce, startWith, timer, Subject } from 'rxjs';
-import { QuestionComponent } from '../question.interface';
+import { EmptyStateEmitable, IQuestionComponent } from '../question.interface';
 import { SelectionModel } from '@angular/cdk/collections';
-import { BehaviorSubject } from 'rxjs';
-import { TeamAssertBooleanQuestionInputData } from 'src/app/survey/survey.component';
+import { TeamAssertBooleanQuestionInputData } from '../question.interface';
 import { TAnswerTeamAssertBoolean } from '@models/survey.model';
 import { TTeammate } from '@models/survey.model';
 
 @Component({
     selector: 'app-question-card-team-assert-boolean',
     templateUrl: './question-card-team-assert-boolean.component.html',
-    styleUrls: ['./question-card-team-assert-boolean.component.scss']
+    styleUrls: ['./question-card-team-assert-boolean.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuestionCardTeamAssertBooleanComponent implements QuestionComponent, OnInit {
+export class QuestionCardTeamAssertBooleanComponent extends EmptyStateEmitable implements IQuestionComponent, OnInit {
 
     @Input() inputData!: TeamAssertBooleanQuestionInputData;
 
-    emptyAnswer = new BehaviorSubject<boolean>(true);
-
-    filter = new FormControl('');
-    filteredTeam = new BehaviorSubject<TTeammate[]>([]);
+    filter = new FormControl('', { nonNullable: true });
+    filteredTeam: ReadonlyArray<TTeammate> = [];
 
     selectionModelArray: Array<SelectionModel<boolean>> = [];
 
     ngOnInit(): void {
 
-        this.selectionModelArray = this.inputData.team.map(teammate => new SelectionModel<boolean>(false))
-
-        this.filteredTeam.next(this.inputData.team);
+        this.selectionModelArray = this.inputData.team.map(() => new SelectionModel<boolean>(false))
+        this.filteredTeam = this.inputData.team;
         this.filter.valueChanges
-            .pipe(
-                startWith(''),
-                debounce(() => timer(500))
-            ).subscribe(value => {
-                this.filterTeam(value || '');
-            })
+            .subscribe(value => this.filterTeam(value))
 
         this.selectionModelArray.forEach(selectionModel =>
             selectionModel.changed
-                .subscribe(() => this.updateEmptyAnswerState()));
+                .subscribe(() => this.checkEmptyAnswer()));
 
     }
 
     private filterTeam(value: string) {
-        this.filteredTeam.next(
-            this.inputData.team.filter(teammate => teammate.fullName.match(new RegExp(value, "i")))
-        )
+        this.filteredTeam = !value
+            ? this.inputData.team
+            : this.inputData.team.filter(teammate => teammate.fullName.match(new RegExp(value, "i")))
     }
 
-    updateEmptyAnswerState() {
-        const emptyAnswer = this.selectionModelArray.every(selectionModel => selectionModel.selected.length === 0);
-        this.emptyAnswer.next(emptyAnswer);
+    override isAnswerEmpty(): boolean {
+        return this.selectionModelArray.every(selectionModel => selectionModel.selected.length === 0);
     }
 
-    confirmAnswer(): TAnswerTeamAssertBoolean {
+    get answer(): TAnswerTeamAssertBoolean {
         const result: TAnswerTeamAssertBoolean = [];
         this.selectionModelArray.forEach((selectionModel, index) => {
             if (selectionModel.selected.length) {

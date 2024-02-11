@@ -1,0 +1,27 @@
+<div class="host-container" [class.disabled]="blockInterface">
+    <div class="header">
+        <div class="title">
+            <div *ngIf="subtitle" class="subtitle">
+                {{subtitle}}
+            </div>
+            <div>
+                {{title || subtitle}}
+            </div>
+        </div>
+        <div class="index">
+            {{currentQuestionIndex + 1}} из {{questionsAmount}}
+        </div>
+    </div>
+    <div class="container">
+        <ng-template questionHost></ng-template>
+    </div>
+    <div class="actions">
+        <mat-checkbox class="example-margin" [(ngModel)]="anonymous" color="primary">Опубликовать
+            анонимно</mat-checkbox>
+        <div>
+            <!-- <button mat-stroked-button color="primary" (click)="stepBack()">Назад</button> -->
+            <button *ngIf="emptyAnswer" mat-stroked-button color="primary" (click)="skipAnswer()">Пропустить</button>
+            <button *ngIf="!emptyAnswer" mat-stroked-button color="primary" (click)="confirmAnswer()">Далее</button>
+        </div>
+    </div>
+</div>

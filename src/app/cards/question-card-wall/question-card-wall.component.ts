@@ -1,9 +1,9 @@
-import { QuestionComponent } from '../question.interface';
-import { Component, Input, EventEmitter, OnInit } from '@angular/core';
+import { EmptyStateEmitable } from './../question.interface';
+import { IQuestionComponent } from '../question.interface';
+import { Component, Input, OnInit } from '@angular/core';
 import { trigger, transition, animate, style, state } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { BehaviorSubject } from 'rxjs';
-import { WallQuestionInputData } from 'src/app/survey/survey.component';
+import { WallQuestionInputData } from '../question.interface';
 import { TAnswerWall, SelfMood } from '@models/survey.model';
 
 @Component({
@@ -27,11 +27,35 @@ import { TAnswerWall, SelfMood } from '@models/survey.model';
         ]),
     ]
 })
-export class QuestionCardWallComponent implements QuestionComponent, OnInit {
+export class QuestionCardWallComponent extends EmptyStateEmitable implements IQuestionComponent, OnInit {
 
     @Input() inputData!: WallQuestionInputData;
-    emptyAnswer = new BehaviorSubject<boolean>(true);
     text: string = '';
+    selectionModel = new SelectionModel<SelfMood>(false);
+
+    ngOnInit() {
+        this.selectionModel.changed.subscribe(() => this.checkEmptyAnswer())
+    }
+
+    isAnswerEmpty(): boolean {
+        return !this.selectionModel.selected.length && !this.text.trim().length;
+    }
+
+    getState(mood: SelfMood) {
+        return this.selectionModel.isSelected(mood) ? 'checked' : 'unchecked'
+    }
+
+    get answer(): TAnswerWall {
+        const result: TAnswerWall = {};
+        const text = this.text.trim();
+        if (text.length){
+            result.text = text;
+        }
+        if (this.selectionModel.selected.length){
+            result.mood = this.selectionModel.selected[0];
+        }
+        return result;
+    }
 
     moods = [
         {
@@ -47,38 +71,5 @@ export class QuestionCardWallComponent implements QuestionComponent, OnInit {
             imgSrc: '/assets/images/wall/happy-mood.png'
         },
     ]
-
-    selectionModel = new SelectionModel<SelfMood>(false);
-
-    ngOnInit() {
-        this.selectionModel.changed.subscribe(() => {
-            this.updateEmptyAnswerState();
-        })
-    }
-
-    updateEmptyAnswerState() {
-        const emptyAnswer = !this.selectionModel.selected.length && !this.text.trim().length;
-        this.emptyAnswer.next(emptyAnswer);
-    }
-
-    getState(mood: SelfMood) {
-        return this.selectionModel.isSelected(mood) ? 'checked' : 'unchecked'
-    }
-
-    confirmAnswer(): TAnswerWall {
-        
-        const result: TAnswerWall = {};
-        if (this.text.trim().length){
-            result.text = this.text.trim();
-        }
-
-        if (this.selectionModel.selected.length){
-            result.mood = this.selectionModel.selected[0];
-        }
-        
-        return result;
-    }
-
-
 
 }

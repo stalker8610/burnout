@@ -29,7 +29,7 @@ export const getCurrentQuestion = createSelector(
     selectFeature,
     getCurrentQuestionIndex,
     getSurvey,
-    (state, questionIndex, survey) => survey?.questions[questionIndex]
+    (state, questionIndex, survey) => survey?.questions[questionIndex] || null
 )
 
 export const getOperationStatus = createSelector(
