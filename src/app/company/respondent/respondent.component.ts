@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output } from '@angular/core';
+import { Component, OnInit, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TObjectId, TWithId } from '@models/common.model';
 import { IRespondent, SignUpStatus } from '@models/respondent.model';
@@ -32,7 +32,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         MatSelectModule,
         MatDatepickerModule,
         NgFor
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RespondentComponent implements OnInit {
 

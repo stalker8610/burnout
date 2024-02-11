@@ -1,5 +1,5 @@
 
-import { Component, Inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Inject } from "@angular/core";
 import { RespondentComponent } from "./respondent.component";
 import { IRespondent } from "@models/respondent.model";
 import { TObjectId, TWithId } from "@models/common.model";
@@ -19,7 +19,8 @@ interface DialogData {
     selector: 'app-respondent-container',
     templateUrl: './respondent-container.component.html',
     standalone: true,
-    imports: [RespondentComponent, AsyncPipe]
+    imports: [RespondentComponent, AsyncPipe],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RespondentContainerComponent {
 
