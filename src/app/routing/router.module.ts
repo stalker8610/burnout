@@ -66,10 +66,14 @@ const routes: Routes = [
                 component: CompanyComponent,
                 pathMatch: 'full'
             },
+            {
+                path: '**',
+                loadComponent: () => import('../not-found/not-found.component').then(module => module.NotFoundComponent)
+            }
         ]
     },
     { path: '', redirectTo: 'home', pathMatch: 'full' },
-    { path: '**', component: NotFoundComponent }
+    { path: '**', loadComponent: () => import('../not-found/not-found.component').then(module => module.NotFoundComponent) }
 ];
 
 // configures NgModule imports and exports
