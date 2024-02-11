@@ -10,7 +10,15 @@ export enum EOperationStatus {
     Failed = 'failed'
 }
 
-export type TQuestionType = 'wall' | 'company' | 'personal' | 'boolean' | 'checkbox'
+//export type TQuestionType = 'wall' | 'company' | 'personal' | 'boolean' | 'checkbox'
+
+export enum EQuestionType {
+    Wall = 'wall',
+    Company = 'company',
+    Pesronal = 'personal',
+    Boolean = 'boolean',
+    Checkbox = 'checkbox'
+}
 
 export interface ISurvey {
     respondentId: TObjectId<IRespondent>,
@@ -23,7 +31,7 @@ export interface ISurvey {
 }
 
 export interface IQuestion {
-    type: TQuestionType,
+    type: EQuestionType,
     title: string,
     category: string,
     inverted: boolean
@@ -32,7 +40,7 @@ export interface IQuestion {
 export type TQuestionConfirmedAnswer = {
     questionId: TObjectId<IQuestion>,
     anonymous?: true,
-    answer: any
+    answer: TAnswer
 }
 
 export type TQuestionSkipped = {
