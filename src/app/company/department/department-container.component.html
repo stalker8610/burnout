@@ -1,0 +1,3 @@
+<app-department [department]="department$ | async" [hasRespondents]="(hasRespondents$ | async) ?? false"
+    (save)="onSave($event)" (disable)="onDisable($event)">
+</app-department>

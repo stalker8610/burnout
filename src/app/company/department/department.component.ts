@@ -1,89 +1,72 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TObjectId, TWithId } from '@models/common.model';
-import { Store } from '@ngrx/store';
 import { IDepartment } from '@models/department.model';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DataActions } from 'src/app/store/data/data.actions';
-import { getDepartment, getRespondentsOfDepartment } from 'src/app/store/data/data.selectors';
-import { filter, map, Observable } from 'rxjs';
-import { IRespondent } from '@models/respondent.model';
-
-interface DialogData {
-    departmentId: TObjectId<IDepartment>
-}
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { isNotNull } from 'src/app/store/util';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-department',
     templateUrl: './department.component.html',
-    styleUrls: ['./department.component.scss']
+    styleUrls: ['./department.component.scss'],
+    standalone: true,
+    imports: [MatFormFieldModule, FormsModule, ReactiveFormsModule, MatInputModule, MatCheckboxModule, MatButtonModule, MatDialogModule],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DepartmentComponent implements OnInit {
-    private readonly departmentId: TObjectId<IDepartment>;
-    hasRespondents;
+
+    @Input() department: Readonly<TWithId<IDepartment>> | null = null;
+    @Input() hasRespondents = false;
+
+    @Output('save') saveEvent = new EventEmitter<TWithId<Partial<IDepartment>>>();
+    @Output('disable') disableEvent = new EventEmitter<TObjectId<IDepartment>>();
 
     formGroup = new FormGroup({
         title: new FormControl('', { validators: [Validators.required], nonNullable: true }),
-    }, { validators: [this.formGroupValidator] });
+    });
 
     disable = new FormControl(false, { nonNullable: true });
     initialRawValue: ReturnType<typeof this.formGroup.getRawValue> | null = null;
 
-    constructor(private store: Store, public dialogRef: MatDialogRef<DepartmentComponent>, @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-        this.departmentId = data.departmentId;
-        this.hasRespondents = this.store.select(getRespondentsOfDepartment(this.departmentId, true))
-            .pipe(
-                map(respondents => !!respondents && respondents.length)
-            )
-            .subscribe(value => {
-                if (value) {
-                    this.disable.disable();
-                }
-            })
-
+    constructor() {
         this.disable.valueChanges.subscribe(
             value => value ? this.formGroup.disable() : this.formGroup.enable()
         )
-
-        this.store
-            .select(getDepartment(this.departmentId))
-            .pipe(filter(value => !!value))
-            .subscribe(
-                (department => {
-                    this.formGroup.controls.title.setValue(department!.title);
-
-                    //this.disable.setValue(respondent!.signUpStatus === SignUpStatus.Disabled);
-                    this.initialRawValue = this.formGroup.getRawValue();
-
-                    /* if (this.waitingForApply) {
-                        setTimeout(() => this.dialogRef.close(), 1500);
-                    } */
-                })
-            )
     }
 
     ngOnInit() {
+        if (isNotNull(this.department)) {
+            this.formGroup.setValue({
+                title: this.department.title
+            });
+            this.initialRawValue = this.formGroup.getRawValue();
+
+            if (this.hasRespondents) {
+                this.disable.disable();
+            }
+        }
     }
 
     save() {
-        //        this.waitingForApply = true;
-        if (this.disable.value) {
-            this.store.dispatch(DataActions.removeDepartment({ _id: this.departmentId }));
-        } else {
-
-            const formData = this.formGroup.getRawValue();
-
-            const department: TWithId<Partial<IDepartment>> = {
-                _id: this.departmentId,
-                title: formData.title,
+        if (isNotNull(this.department)) {
+            if (this.disable.value) {
+                this.disableEvent.emit(this.department._id);
+            } else {
+                const formData = this.formGroup.getRawValue();
+                const department: TWithId<Partial<IDepartment>> = {
+                    _id: this.department._id,
+                    title: formData.title,
+                }
+                this.saveEvent.emit(department);
             }
-
-            this.store.dispatch(DataActions.patchDepartment({ department }));
         }
-        this.dialogRef.close();
-
     }
-    getEmptyError() {
+
+    getEmptyErrorMessage() {
         return 'Необходимо заполнить поле'
     }
 
@@ -95,18 +78,6 @@ export class DepartmentComponent implements OnInit {
         return 'Отдел будет удален без возможности восстановления'
     }
 
-    formGroupValidator(formGroup: AbstractControl) {
-
-        const controls = Object.keys((formGroup as FormGroup).controls);
-
-        const isFormInvalid = controls.reduce((prev, curr) => {
-            const control = (formGroup as FormGroup).controls[curr];
-            return prev || control.invalid;
-        }, false);
-
-        return isFormInvalid ? { formInvalid: true } : null
-    }
-
     hasChanges() {
         return JSON.stringify(this.initialRawValue) !== JSON.stringify(this.formGroup.getRawValue());
     }
@@ -114,6 +85,5 @@ export class DepartmentComponent implements OnInit {
     shouldShowDisableHint() {
         return this.disable.value && this.disable.dirty;
     }
-
 
 }

@@ -1,19 +1,18 @@
 <mat-dialog-content>
     <form [formGroup]="formGroup">
-        <div class="flex-container">
-            <div><mat-form-field>
-                    <mat-label>Наименование</mat-label>
-                    <input matInput placeholder="Отдел продаж" formControlName="title">
-                    <mat-error>{{getEmptyError()}}</mat-error>
-                </mat-form-field>
-            </div>
+        <div>
+            <mat-form-field>
+                <mat-label>Наименование</mat-label>
+                <input matInput placeholder="Отдел продаж" formControlName="title">
+                <mat-error>{{getEmptyErrorMessage()}}</mat-error>
+            </mat-form-field>
         </div>
     </form>
     <mat-checkbox [formControl]="disable" color="warn">{{getRemoveActionName()}}</mat-checkbox>
     <mat-error [class.invisible]="!shouldShowDisableHint()">{{getRemoveActionHint()}}</mat-error>
 </mat-dialog-content>
 <mat-dialog-actions [align]="'end'">
-    <button mat-stroked-button (click)="save()" type="button" [disabled]="!disable.value && (formGroup.invalid || !hasChanges())"
-        color="primary">Сохранить</button>
+    <button mat-stroked-button (click)="save()" type="button"
+        [disabled]="!disable.value && (formGroup.invalid || !hasChanges())" color="primary">Сохранить</button>
     <button mat-stroked-button mat-dialog-close="" type="button" color="primary">Отмена</button>
 </mat-dialog-actions>

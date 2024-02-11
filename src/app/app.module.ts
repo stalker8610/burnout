@@ -78,7 +78,6 @@ import {
 
 
 import { CompanyEditComponent } from './company/company-edit/company-edit.component';
-import { DepartmentComponent } from './company/department/department.component';
 import { FocusableDirective } from './focusable.directive';
 
 import { ReportCompanyComponent } from './reports/report-company/report-company.component';
@@ -106,7 +105,6 @@ import { QuestionCardLayoutComponent } from './cards/question-card-layout/questi
         CompanyComponent,
         CompanyTreeComponent,
         CompanyEditComponent,
-        DepartmentComponent,
         FocusableDirective,
         ReportPersonalEfficiencyComponent,
         ReportCompanyComponent,
