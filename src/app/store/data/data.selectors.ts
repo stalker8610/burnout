@@ -19,8 +19,9 @@ export const getDataLoadError = createSelector(
 export const getTeam = (withDisabled: boolean) => createSelector(
     selectFeature,
     (state: IState) => {
-        if (withDisabled) return state.data?.team;
-        return state.data?.team.filter(teammate => teammate.signUpStatus !== SignUpStatus.Disabled);
+        return (withDisabled
+            ? state.data?.team
+            : state.data?.team.filter(teammate => teammate.signUpStatus !== SignUpStatus.Disabled)) || [];
     }
 )
 
