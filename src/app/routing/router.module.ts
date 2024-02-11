@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, provideRouter, withComponentInputBinding } from '@angular/router';
 
-import { HomeComponent } from '../home/home.component';
 import { NotFoundComponent } from '../not-found/not-found.component';
 import { SurveyComponent } from '../survey/survey.component';
 import { ReportWallComponent } from '../reports/report-wall/report-wall.component';
@@ -11,7 +10,6 @@ import { ReportCompanyComponent } from '../reports/report-company/report-company
 
 import { isAuthorizedGuard, isHRUserGuard, isNotAuthorizedGuard, redirectHomeGuard } from './guards.service';
 import { ReportPersonalComponent } from '../reports/report-personal/report-personal.component';
-
 
 const routes: Routes = [
     {
@@ -29,7 +27,9 @@ const routes: Routes = [
     { path: 'survey/:surveyId', canActivate: [isAuthorizedGuard], component: SurveyComponent, pathMatch: 'full' },
 
     {
-        path: 'home', component: HomeComponent, canActivate: [isAuthorizedGuard],
+        path: 'home',
+        loadComponent: () => import('../home/home.component').then(module => module.HomeComponent),
+        canActivate: [isAuthorizedGuard],
         children: [
             {
                 path: '',

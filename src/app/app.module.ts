@@ -29,7 +29,6 @@ import { AppRoutingModule } from './routing/router.module';
 
 import { AppComponent } from './app.component';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { HomeComponent } from './home/home.component';
 import { QuestionCardContainerComponent } from './cards/question-card-container/question-card-container.component';
 import { QuestionCardWallComponent } from './cards/question-card-wall/question-card-wall.component';
 import { QuestionCardCompanyComponent } from './cards/question-card-company/question-card-company.component';
@@ -103,7 +102,6 @@ import { LoginStatusContainerComponent } from './auth/login-status/login-status-
     declarations: [
         AppComponent,
         NotFoundComponent,
-        HomeComponent,
         QuestionCardContainerComponent,
         QuestionCardWallComponent,
         QuestionCardCompanyComponent,
