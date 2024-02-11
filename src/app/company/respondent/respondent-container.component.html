@@ -1,0 +1,3 @@
+<app-respondent [respondent]="respondent$ | async" [departments]="(departments$  | async) ?? []" (save)="onSave($event)"
+    (disable)="onDisable($event)">
+</app-respondent>

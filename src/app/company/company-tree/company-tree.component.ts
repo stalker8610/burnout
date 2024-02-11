@@ -12,9 +12,9 @@ import { DataActions } from 'src/app/store/data/data.actions';
 import { FormControl } from '@angular/forms';
 import { getSignUpStatusView } from 'src/app/store/data/data.util';
 import { MatDialog } from '@angular/material/dialog';
-import { RespondentComponent } from '../respondent/respondent.component';
 import { AuthActions } from 'src/app/store/auth/auth.actions';
 import { DepartmentComponent } from '../department/department.component';
+import { RespondentContainerComponent } from '../respondent/respondent-container.component';
 
 enum ENodeTypes {
     Department = 'department',
@@ -244,7 +244,7 @@ export class CompanyTreeComponent implements OnInit {
 
 
     openRespondentEditDialog(respondentId: TObjectId<IRespondent>): void {
-        this.editDialog.open(RespondentComponent, {
+        this.editDialog.open(RespondentContainerComponent, {
             width: '600px',
             disableClose: true,
             data: { respondentId }

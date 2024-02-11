@@ -16,7 +16,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDateFnsModule } from '@angular/material-date-fns-adapter';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -78,11 +77,7 @@ import {
 } from './store/reports/report-pass-statistic.store';
 
 
-
-
-
 import { CompanyEditComponent } from './company/company-edit/company-edit.component';
-import { RespondentComponent } from './company/respondent/respondent.component';
 import { DepartmentComponent } from './company/department/department.component';
 import { FocusableDirective } from './focusable.directive';
 
@@ -111,7 +106,6 @@ import { QuestionCardLayoutComponent } from './cards/question-card-layout/questi
         CompanyComponent,
         CompanyTreeComponent,
         CompanyEditComponent,
-        RespondentComponent,
         DepartmentComponent,
         FocusableDirective,
         ReportPersonalEfficiencyComponent,
@@ -140,7 +134,6 @@ import { QuestionCardLayoutComponent } from './cards/question-card-layout/questi
         MatTreeModule,
         MatSnackBarModule,
         MatMenuModule,
-        MatDatepickerModule,
         MatDateFnsModule,
         MatSelectModule,
         MatDialogModule,

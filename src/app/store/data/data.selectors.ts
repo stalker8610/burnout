@@ -26,12 +26,12 @@ export const getTeam = (withDisabled: boolean) => createSelector(
 
 export const getDepartments = createSelector(
     selectFeature,
-    (state: IState) => state.data?.departments
+    (state: IState) => state.data?.departments || []
 )
 
 export const getRespondent = (_id: TObjectId<IRespondent>) => createSelector(
     selectFeature,
-    (state: IState) => state.data?.team.find(respondent => respondent._id === _id)!
+    (state: IState) => state.data?.team.find(respondent => respondent._id === _id) || null
 )
 
 export const getRespondentsOfDepartment = (_id: TObjectId<IDepartment>, withDisabled: boolean) => createSelector(

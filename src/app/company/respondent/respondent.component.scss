@@ -1,13 +1,5 @@
 form {
     display: flex;
-    flex-direction: column;
-}
-
-.flex-container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-
 
     &>div {
         display: flex;
@@ -18,9 +10,7 @@ form {
     &>div:not(:last-of-type) {
         margin-right: 20px;
     }
-
 }
-
 
 mat-error {
     transition: opacity 0.5s;

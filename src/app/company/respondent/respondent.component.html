@@ -1,68 +1,64 @@
 <mat-dialog-content>
     <form [formGroup]="formGroup">
-        <div class="flex-container">
-            <div><mat-form-field>
-                    <mat-label>Фамилия</mat-label>
-                    <input matInput placeholder="Иванов" formControlName="lastName">
-                    <mat-error>{{getEmptyError()}}</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Имя</mat-label>
-                    <input matInput placeholder="Иван" formControlName="firstName">
-                    <mat-error>{{getEmptyError()}}</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Отчество</mat-label>
-                    <input matInput placeholder="Иванович" formControlName="middleName">
-                    <mat-error>{{getEmptyError()}}</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>E-mail</mat-label>
-                    <input matInput placeholder="ivanov@yandex.ru" formControlName="email">
-                    <mat-error>{{getEmailErrorMessage()}}</mat-error>
-                </mat-form-field>
-                <!-- <mat-checkbox formControlName="isRemote" color="primary">Работает удаленно</mat-checkbox> -->
-                <mat-checkbox formControlName="doSendSurveys" color="primary">Отправлять опросы</mat-checkbox>
+        <div>
+            <mat-form-field>
+                <mat-label>Фамилия</mat-label>
+                <input matInput placeholder="Иванов" formControlName="lastName">
+                <mat-error>{{getEmptyErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Имя</mat-label>
+                <input matInput placeholder="Иван" formControlName="firstName">
+                <mat-error>{{getEmptyErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Отчество</mat-label>
+                <input matInput placeholder="Иванович" formControlName="middleName">
+                <mat-error>{{getEmptyErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>E-mail</mat-label>
+                <input matInput placeholder="ivanov@yandex.ru" formControlName="email">
+                <mat-error>{{getEmailErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <!-- <mat-checkbox formControlName="isRemote" color="primary">Работает удаленно</mat-checkbox> -->
+            <mat-checkbox formControlName="doSendSurveys" color="primary">Отправлять опросы</mat-checkbox>
+        </div>
+        <div>
+            <mat-form-field>
+                <mat-label>Дата рождения</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="birthDate">
+                <mat-hint>ДД.ММ.ГГГГ</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error>Неверный формат даты</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Отдел</mat-label>
+                <mat-select formControlName="department">
+                    <mat-option *ngFor="let department of departments; index as i; trackBy: trackDepartmentById"
+                        [value]="department._id">{{department.title}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Должность</mat-label>
+                <input matInput formControlName="position">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Права доступа</mat-label>
+                <mat-select formControlName="scope">
+                    <mat-option *ngFor="let scope of availableScopes"
+                        [value]="scope">{{getScopeView(scope)}}</mat-option>
+                </mat-select>
+            </mat-form-field>
 
-
-            </div>
-            <div>
-                <mat-form-field>
-                    <mat-label>Дата рождения</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="birthDate">
-                    <mat-hint>ДД.ММ.ГГГГ</mat-hint>
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                    <mat-error>Неверный формат даты</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Отдел</mat-label>
-                    <mat-select formControlName="department">
-                        <mat-option
-                            *ngFor="let department of departments | async; index as i; trackBy: trackDepartmentById"
-                            [value]="department._id">{{department.title}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Должность</mat-label>
-                    <input matInput formControlName="position">
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Права доступа</mat-label>
-                    <mat-select formControlName="scope">
-                        <mat-option *ngFor="let scope of availableScopes"
-                            [value]="scope">{{getScopeView(scope)}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-            </div>
         </div>
     </form>
     <mat-checkbox [formControl]="disable" color="warn">Отключить учетную запись</mat-checkbox>
     <mat-error [class.invisible]="!shouldShowDisableHint()">{{getRemoveActionHint()}}</mat-error>
 </mat-dialog-content>
 <mat-dialog-actions [align]="'end'">
-    <button mat-stroked-button (click)="save()" type="button" [disabled]="!disable.value && (formGroup.invalid || !hasChanges())"
-        color="primary">Сохранить</button>
+    <button mat-stroked-button (click)="save()" type="button"
+        [disabled]="!disable.value && (formGroup.invalid || !hasChanges())" color="primary">Сохранить</button>
     <button mat-stroked-button mat-dialog-close="" type="button" color="primary">Отмена</button>
 </mat-dialog-actions>
