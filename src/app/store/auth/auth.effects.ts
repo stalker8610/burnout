@@ -12,6 +12,7 @@ import { concatLatestFrom } from "@ngrx/effects"
 import { ISignupToken } from "@models/token.model"
 import { getRespondent } from "../data/data.selectors"
 import { handleError } from "../error.handler"
+import { isNotNull } from "../util";
 
 export const authStatusRequested$ = createEffect((actions$ = inject(Actions), store = inject(Store)) =>
     actions$.pipe(
@@ -105,10 +106,9 @@ export const invite$ = createEffect((actions$ = inject(Actions), authService = i
         ofType(AuthActions.invite),
         concatLatestFrom(
             (action) => [
-                store.select(getAuthorizedUser),
-                store.select(getRespondent(action.respondentId))
+                store.select(getAuthorizedUser).pipe(filter(isNotNull)),
+                store.select(getRespondent(action.respondentId)).pipe(filter(isNotNull))
             ]),
-        filter(([action, user, respondent]) => !!user && !!respondent),
         exhaustMap(([action, user, respondent]) => {
 
             const tokenData: ISignupToken = {
