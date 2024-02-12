@@ -1,73 +1,85 @@
-import { DataActions, type TNewResponentToCreate } from 'src/app/store/data/data.actions';
-import { getDepartments } from '../../store/data/data.selectors';
-import { Store } from '@ngrx/store';
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IDepartment } from '@models/department.model';
 import { TWithId } from '@models/common.model';
-import { Observable, of, startWith, map, switchMap, filter } from 'rxjs';
+import { type TNewResponentToCreate } from 'src/app/store/data/data.actions';
+import { EventEmitter } from '@angular/core';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { switchMap, of, BehaviorSubject, startWith, Observable, combineLatest } from 'rxjs';
+
+type TDepartmentsArray = ReadonlyArray<TWithId<IDepartment>>;
 
 @Component({
     selector: 'app-company-edit',
     templateUrl: './company-edit.component.html',
-    styleUrls: ['./company-edit.component.scss']
+    styleUrls: ['./company-edit.component.scss'],
+    imports: [NgFor, NgIf, AsyncPipe, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatAutocompleteModule],
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompanyEditComponent implements OnInit {
 
+    departments$: BehaviorSubject<TDepartmentsArray> = new BehaviorSubject<TDepartmentsArray>([]);
+    @Input() set departments(arr: TDepartmentsArray | null) {
+        this.departments$.next(arr || []);
+    }
+    @Output('addRespondent') addRespondentEvent = new EventEmitter<TNewResponentToCreate>();
+
     formGroup = new FormGroup({
-        userName: new FormControl('', { validators: [Validators.required] }),
-        email: new FormControl('', { validators: [Validators.required, Validators.email] }),
-        department: new FormControl<string | TWithId<IDepartment>>('', { validators: [Validators.required] }),
+        userName: new FormControl('', { validators: [Validators.required], nonNullable: true }),
+        email: new FormControl('', { validators: [Validators.required, Validators.email], nonNullable: true }),
+        department: new FormControl<string | TWithId<IDepartment>>('', { validators: [Validators.required], nonNullable: true }),
     })
 
-    filteredDepartments$: Observable<IDepartment[]> = of([]);
-
-    constructor(private store: Store) { }
+    filteredDepartments$: Observable<TDepartmentsArray> = of([]);
 
     ngOnInit() {
-        this.store.dispatch(DataActions.loadRequested());
-        this.filteredDepartments$ = this.store.select(getDepartments).pipe(
-            filter(departments => !!departments && !!departments.length),
-            switchMap(departments => this.formGroup.controls.department.valueChanges.pipe(
+        this.filteredDepartments$ = combineLatest([
+            this.departments$,
+            this.formGroup.controls.department.valueChanges.pipe(
                 startWith(''),
-                switchMap(value => typeof value === 'string' ? of(value) : of(value?.title)),
-                map((substring) => substring ? this._filter(departments!, substring) : departments!.slice()),
-                map(departments => departments.sort((a, b) => a.title.localeCompare(b.title)))
-            ))
-        )
+                switchMap(value => typeof value === 'string' ? of(value) : of(value.title))
+            )])
+            .pipe(
+                switchMap(([departments, substr]) =>
+                    substr
+                        ? of(departments.filter(option => option.title.match(new RegExp(substr, 'i'))))
+                        : of(departments)
+                ))
     }
 
-    displayFn(department: IDepartment): string {
+    displayFn(department: IDepartment) {
         return department && department.title ? department.title : '';
-    }
-
-    private _filter(departments: IDepartment[], substring: string): IDepartment[] {
-        const substringToSearch = substring.toLowerCase();
-        return departments.filter(option => option.title.toLowerCase().includes(substringToSearch));
     }
 
     addRespondent() {
 
+        const { userName: name, email, department } = this.formGroup.getRawValue();
+
         let newRespondent: TNewResponentToCreate;
-        let newRespondentBase = {
-            name: this.formGroup.controls.userName.value!,
-            email: this.formGroup.controls.email.value!,
-        }
-        if (typeof this.formGroup.controls.department.value === 'object') {
-            newRespondent = Object.assign({}, newRespondentBase, {
-                departmentId: this.formGroup.controls.department.value!._id
+        let newRespondentBase = { name, email };
+
+        if (typeof department === 'object') {
+            newRespondent = Object.assign(newRespondentBase, {
+                departmentId: department._id
             })
         } else {
-            newRespondent = Object.assign({}, newRespondentBase, {
-                newDepartmentTitle: this.formGroup.controls.department.value!
+            newRespondent = Object.assign(newRespondentBase, {
+                newDepartmentTitle: department
             })
         }
-        this.store.dispatch(DataActions.addRespondentRequest({ respondent: newRespondent }));
-        this.resetForm();
+
+        this.addRespondentEvent.emit(newRespondent);
+        this.formGroup.reset();
     }
 
     newDepartmentWillBeCreated(): boolean {
-        return !!(this.formGroup.controls.department.value && typeof this.formGroup.controls.department.value === 'string')
+        const { department } = this.formGroup.getRawValue();
+        return typeof department === 'string' && !!department;
     }
 
     getErrorText(controlName: 'userName' | 'email' | 'department') {
@@ -79,9 +91,4 @@ export class CompanyEditComponent implements OnInit {
         } else return ''
     }
 
-    resetForm() {
-        this.formGroup.reset();
-        /* this.formGroup.controls.email.reset();
-        this.formGroup.controls.department.reset(); */
-    }
 }

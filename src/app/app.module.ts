@@ -77,7 +77,6 @@ import {
 } from './store/reports/report-pass-statistic.store';
 
 
-import { CompanyEditComponent } from './company/company-edit/company-edit.component';
 import { FocusableDirective } from './focusable.directive';
 
 import { ReportCompanyComponent } from './reports/report-company/report-company.component';
@@ -89,7 +88,7 @@ import { ReportPersonalEfficiencyComponent } from './reports/report-personal/rep
 import { ReportPersonalSkillsComponent } from './reports/report-personal/report-personal-skills/report-personal-skills.component';
 import { LoginStatusContainerComponent } from './auth/login-status/login-status-container.component';
 import { QuestionCardLayoutComponent } from './cards/question-card-layout/question-card-layout.component';
-
+import { CompanyEditContainerComponent } from './company/company-edit/company-edit-container.component';
 
 @NgModule({
     declarations: [
@@ -104,7 +103,7 @@ import { QuestionCardLayoutComponent } from './cards/question-card-layout/questi
         ReportWallComponent,
         CompanyComponent,
         CompanyTreeComponent,
-        CompanyEditComponent,
+        
         FocusableDirective,
         ReportPersonalEfficiencyComponent,
         ReportCompanyComponent,
@@ -161,6 +160,7 @@ import { QuestionCardLayoutComponent } from './cards/question-card-layout/questi
         LoginStatusContainerComponent,
         LogoutComponent,
         QuestionCardLayoutComponent,
+        CompanyEditContainerComponent,
     ],
     providers: [
         {
