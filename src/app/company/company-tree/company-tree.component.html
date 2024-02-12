@@ -1,71 +1,14 @@
 <div class="caption">Структура компании</div>
-<mat-tree [dataSource]="dataSource" [trackBy]="trackByFn" [treeControl]="treeControl">
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-        <div *ngIf="node.type === ENodeTypes.Respondent; else department">
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Respondent menu"
-                [disabled]="isDisabled(node)">
-                <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="edit(node)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Редактировать</span>
-                </button>
-                <button mat-menu-item (click)="invite(node)" [disabled]="!invitable(node)">
-                    <mat-icon>email</mat-icon>
-                    <span>Отправить приглашение</span>
-                </button>
-                <button mat-menu-item (click)="remove(node)" [disabled]="!removable(node)">
-                    <mat-icon>close</mat-icon>
-                    <span>Удалить</span>
-                </button>
-            </mat-menu>
-        </div>
+<mat-tree [dataSource]="dataSource" [trackBy]="trackByFn" [treeControl]="treeControl" #tree>
 
+    <mat-tree-node *matTreeNodeDef="let node; when isDepartment" matTreeNodePadding>
+        <app-department-node class="node" [node]="node" [expanded]="treeControl.isExpanded(node)" (edit)="edit($event)"
+            (toggle)="toggle(node)"></app-department-node>
+    </mat-tree-node>
 
-        <ng-template #department>
-            <!-- use a disabled button to provide padding for tree leaf -->
-            <button *ngIf="node.expandable; else notExpandable" mat-icon-button matTreeNodeToggle
-                [attr.aria-label]="'Toggle ' + node.title">
-                <mat-icon class="mat-icon-rtl-mirror">
-                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-                </mat-icon>
-            </button>
-            <ng-template #notExpandable>
-                <button mat-icon-button disabled></button>
-            </ng-template>
-        </ng-template>
-
-        <div [class]="getNodeClass(node)">
-            <!-- <div *ngIf="editNode?._id === node._id; else viewMode">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <input matInput appFocusable type="text" [formControl]="editNodeControl" (blur)="confirmEdit()"
-                        (keydown.enter)="confirmEdit()" (keydown.escape)="cancelEdit()">
-                </mat-form-field>
-            </div>
-            <ng-template #viewMode>
-                <div *ngIf="node.type === ENodeTypes.Respondent" class="respondent-view">
-                    <div>{{node.title}}</div>
-                    <div class="email">{{node.email}}</div>
-                    <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
-                    </div>
-                </div>
-                <div *ngIf="node.type === ENodeTypes.Department" matTreeNodeToggle>
-                    {{nodeTitle(node)}}
-                </div>
-            </ng-template> -->
-            <div *ngIf="node.type === ENodeTypes.Respondent" class="respondent-view">
-                <div (click)="edit(node)">{{node.title}}</div>
-                <div class="email">{{node.email}}</div>
-                <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
-                </div>
-            </div>
-            <div *ngIf="node.type === ENodeTypes.Department" (click)="edit(node)">
-                {{nodeTitle(node)}}
-            </div>
-            <!-- matTreeNodeToggle -->
-        </div>
-
+    <mat-tree-node *matTreeNodeDef="let node; when isRespondent" matTreeNodePadding>
+        <app-respondent-node class="node" [node]="node" (edit)="edit($event)" (remove)="remove($event)"
+            (invite)="invite($event)"></app-respondent-node>
     </mat-tree-node>
 
 </mat-tree>

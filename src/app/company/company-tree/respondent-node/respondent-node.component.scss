@@ -1,0 +1,38 @@
+@use '@angular/material' as mat;
+@import 'src/vars.scss';
+@import 'src/common.scss';
+
+.respondent {
+    font-size: 14px;
+    width: 100%;
+}
+
+.respondent-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    max-width: 600px;
+    div:first-of-type {
+        cursor: pointer;
+    }
+}
+
+.disabled-respondent {
+    opacity: 0.35;
+}
+
+.signedUp {
+    color: mat.get-color-from-palette(mat.$green-palette, 500);
+}
+
+.invited {
+    color: mat.get-color-from-palette(mat.$indigo-palette, 500);
+}
+
+.notInvitedYet {
+    color: mat.get-color-from-palette($warn-palette, 500);
+}
+
+.email {
+    opacity: 0.7;
+}

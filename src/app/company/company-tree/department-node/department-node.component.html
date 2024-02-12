@@ -1,0 +1,15 @@
+<button *ngIf="node.expandable; else notExpandable" mat-icon-button (click)="toggle.emit()"
+    [attr.aria-label]="'Toggle ' + node.title">
+    <mat-icon class="mat-icon-rtl-mirror">
+        {{expanded ? 'expand_more' : 'chevron_right'}}
+    </mat-icon>
+</button>
+<ng-template #notExpandable>
+    <button mat-icon-button disabled></button>
+</ng-template>
+
+<div class="node department">
+    <div (click)="edit()">
+        {{nodeTitle()}}
+    </div>
+</div>

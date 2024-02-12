@@ -1,0 +1,28 @@
+<div>
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Respondent menu" [disabled]="isDisabled()">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="edit()">
+            <mat-icon>edit</mat-icon>
+            <span>Редактировать</span>
+        </button>
+        <button mat-menu-item (click)="invite()" [disabled]="!invitable()">
+            <mat-icon>email</mat-icon>
+            <span>Отправить приглашение</span>
+        </button>
+        <button mat-menu-item (click)="remove()" [disabled]="!removable()">
+            <mat-icon>close</mat-icon>
+            <span>Удалить</span>
+        </button>
+    </mat-menu>
+</div>
+
+<div class="node respondent" [class.disabled-respondent]="node.signUpStatus === SignUpStatus.Disabled">
+    <div class="respondent-view">
+        <div (click)="edit()">{{node.title}}</div>
+        <div class="email">{{node.email}}</div>
+        <div [class]="getSignUpStatusClass(node.signUpStatus)">{{getSignUpStatusView(node.signUpStatus)}}
+        </div>
+    </div>
+</div>

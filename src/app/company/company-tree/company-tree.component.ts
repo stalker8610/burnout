@@ -1,25 +1,15 @@
+import { NgIf } from '@angular/common';
 import { IRespondent, SignUpStatus } from '@models/respondent.model';
 import { IDepartment } from '@models/department.model';
-import { TObjectId } from '@models/common.model';
-import { map, switchMap, tap, of } from 'rxjs';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, OnChanges } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { Store } from '@ngrx/store';
-import { getDepartmentsAndTeam, getTeam } from '../../store/data/data.selectors';
-import { concatRespondentName, parseName } from 'src/app/store/data/data.util';
-import { DataActions } from 'src/app/store/data/data.actions';
-import { FormControl } from '@angular/forms';
-import { getSignUpStatusView } from 'src/app/store/data/data.util';
-import { MatDialog } from '@angular/material/dialog';
-import { AuthActions } from 'src/app/store/auth/auth.actions';
-import { DepartmentContainerComponent } from '../department/department-container.component';
-import { RespondentContainerComponent } from '../respondent/respondent-container.component';
-
-enum ENodeTypes {
-    Department = 'department',
-    Respondent = 'respondent'
-}
+import { MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule } from '@angular/material/tree';
+import { concatRespondentName } from 'src/app/store/data/data.util';
+import { TWithId } from '@models/common.model';
+import { EventEmitter } from '@angular/core';
+import { ENodeTypes, IDepartmentContainerNode, IRespondentContainerNode, TContainerNode } from './company-tree-container.component';
+import { RespondentNodeComponent } from './respondent-node/respondent-node.component';
+import { DepartmentNodeComponent } from './department-node/department-node.component';
 
 interface INode {
     childCount: number,
@@ -27,19 +17,15 @@ interface INode {
     title: string;
 }
 
-interface IDepartmentNode extends INode {
-    _id: TObjectId<IDepartment>,
-    type: ENodeTypes.Department
-}
+export interface IDepartmentNode extends INode, IDepartmentContainerNode { }
 
-interface IRespondentNode extends INode {
-    _id: TObjectId<IRespondent>,
-    type: ENodeTypes.Respondent,
+export interface IRespondentNode extends INode, IRespondentContainerNode {
     signUpStatus: SignUpStatus,
     email: string
 }
 
 type ITreeNode = IDepartmentNode | IRespondentNode
+
 type IFlatNode = ITreeNode & {
     level: number;
 }
@@ -48,11 +34,18 @@ type IFlatNode = ITreeNode & {
     selector: 'app-company-tree',
     templateUrl: './company-tree.component.html',
     styleUrls: ['./company-tree.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgIf, MatTreeModule, RespondentNodeComponent, DepartmentNodeComponent]
 })
-export class CompanyTreeComponent implements OnInit {
+export class CompanyTreeComponent implements OnChanges {
 
-    ENodeTypes = ENodeTypes;
+    @Input() respondents: ReadonlyArray<TWithId<IRespondent>> = [];
+    @Input() departments: ReadonlyArray<TWithId<IDepartment>> = [];
+
+    @Output('edit') editEvent = new EventEmitter<TContainerNode>();
+    @Output('remove') removeEvent = new EventEmitter<IRespondentContainerNode>();
+    @Output('invite') inviteEvent = new EventEmitter<IRespondentContainerNode>();
 
     private _transformer = (node: ITreeNode, level: number): IFlatNode => {
         return Object.assign({}, node, {
@@ -69,114 +62,61 @@ export class CompanyTreeComponent implements OnInit {
         this._transformer,
         node => node.level,
         node => node.expandable,
-        node => this.store.select(getTeam(true)).pipe(
-            map(respondents =>
-                (respondents?.filter(respondent => respondent.departmentId === node._id)
-                    .map(respondent => ({
-                        _id: respondent._id,
-                        type: ENodeTypes.Respondent,
-                        title: this.respondentName(respondent),
-                        expandable: false,
-                        email: respondent.email,
-                        signUpStatus: respondent.signUpStatus,
-                    })) || [])
-                    .sort((a, b) => a.title.localeCompare(b.title)) as Array<ITreeNode>
-            )
-        )
+        node => this.respondents
+            .filter(respondent => respondent.departmentId === node._id)
+            .map(respondent => ({
+                _id: respondent._id,
+                type: ENodeTypes.Respondent,
+                title: concatRespondentName(respondent),
+                expandable: false,
+                email: respondent.email,
+                signUpStatus: respondent.signUpStatus,
+            }))
+            .sort((a, b) => a.title.localeCompare(b.title)) as Array<ITreeNode>
     );
 
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-    editNode: IFlatNode | null = null;
-    editNodeControl = new FormControl('');
+    ngOnChanges() {
+        const data = this.departments.map(
+            department => {
+                const childCount = this.respondents.reduce((prev, el) => prev + (el.departmentId === department._id ? 1 : 0), 0);
+                return {
+                    _id: department._id,
+                    type: ENodeTypes.Department,
+                    title: department.title,
+                    childCount,
+                    expandable: childCount > 0,
+                }
+            }
+        ) as ITreeNode[];
+        this.updateTreeView(data);
+    }
 
-    constructor(private store: Store, public editDialog: MatDialog) { }
-
-    ngOnInit(): void {
-        this.store.select(getDepartmentsAndTeam)
-            .pipe(
-                switchMap(({ departments, team }) =>
-                    of((departments?.slice().sort((a, b) => a.title.localeCompare(b.title))
-                        .map(
-                            department => {
-                                const childCount = team?.filter(element => element.departmentId === department._id).length || 0;
-                                return {
-                                    _id: department._id,
-                                    type: ENodeTypes.Department,
-                                    title: department.title,
-                                    childCount,
-                                    expandable: !!childCount,
-                                }
-                            }) || []) as Array<ITreeNode>)
-                )
-            ).subscribe(
-                data => {
-                    if (!this.dataSource.data.length) {
-                        this.dataSource.data = data;
-                        this.treeControl.expandAll();
-                    } else {
-                        // re-expand nodes after new node was added
-                        const expandedNodes: IFlatNode['_id'][] = [];
-                        if (this.treeControl.dataNodes) {
-                            this.treeControl.dataNodes.forEach(node => {
-                                if (this.treeControl.isExpandable(node) && this.treeControl.isExpanded(node)) {
-                                    expandedNodes.push(node._id);
-                                }
-                            });
-                        }
-
-                        this.dataSource.data = data;
-
-                        this.treeControl.dataNodes
-                            .filter(node => expandedNodes.find(_id => _id === node._id))
-                            .forEach(nodeToExpand => {
-                                if (this.treeControl.isExpandable(nodeToExpand)) {
-                                    this.treeControl.expand(nodeToExpand);
-                                }
-                            });
+    updateTreeView(data: ITreeNode[]) {
+        if (!this.dataSource.data.length) {
+            this.dataSource.data = data;
+            this.treeControl.expandAll();
+        } else {
+            // re-expand nodes after new node was added
+            const expandedNodes: IFlatNode['_id'][] = [];
+            if (this.treeControl.dataNodes) {
+                this.treeControl.dataNodes.forEach(node => {
+                    if (this.treeControl.isExpandable(node) && this.treeControl.isExpanded(node)) {
+                        expandedNodes.push(node._id);
                     }
-
                 });
-    }
+            }
 
-    hasChild = (_: number, node: IFlatNode) => node.expandable;
+            this.dataSource.data = data;
 
-    getNodeClass(node: IFlatNode) {
-        return {
-            'node': true,
-            'department': node.type === ENodeTypes.Department,
-            'respondent': node.type === ENodeTypes.Respondent,
-            'disabled-respondent': node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.Disabled
-        }
-    }
-
-    nodeTitle = (node: IFlatNode) => {
-        let title = node.title;
-        if (node.childCount) {
-            title = title + ` (${node.childCount})`;
-        }
-        return title;
-    }
-
-    removable = (node: IFlatNode) => {
-        return node.type === ENodeTypes.Respondent && (node.signUpStatus === SignUpStatus.NotInvitedYet ||
-            node.signUpStatus === SignUpStatus.Invited);
-    }
-
-    invitable = (node: IFlatNode) => {
-        return node.type === ENodeTypes.Respondent && (node.signUpStatus === SignUpStatus.NotInvitedYet ||
-            node.signUpStatus === SignUpStatus.Invited);
-    }
-
-    isDisabled = (node: IFlatNode) => {
-        return node.type === ENodeTypes.Respondent && node.signUpStatus === SignUpStatus.Disabled;
-    }
-
-    getSignUpStatusClass = (status: SignUpStatus) => {
-        return {
-            signedUp: status === SignUpStatus.SingedUp,
-            invited: status === SignUpStatus.Invited,
-            notInvitedYet: status === SignUpStatus.NotInvitedYet
+            this.treeControl.dataNodes
+                .filter(node => expandedNodes.find(_id => _id === node._id))
+                .forEach(nodeToExpand => {
+                    if (this.treeControl.isExpandable(nodeToExpand)) {
+                        this.treeControl.expand(nodeToExpand);
+                    }
+                });
         }
     }
 
@@ -184,81 +124,29 @@ export class CompanyTreeComponent implements OnInit {
         return item;
     }
 
-    private respondentName(respondent: IRespondent) {
-        return concatRespondentName(respondent);
+    edit(node: ITreeNode) {
+        this.editEvent.emit(node);
     }
 
-    edit(node: IFlatNode) {
-        /* this.editNode = node;
-        this.editNodeControl.reset(node.title); */
-        if (node.type === ENodeTypes.Respondent) {
-            this.openRespondentEditDialog(node._id);
-        } else if (node.type === ENodeTypes.Department) {
-            this.openDepartmentEditDialog(node._id);
-        }
+    remove(node: IRespondentNode) {
+        this.removeEvent.emit(node);
     }
 
-    invite(node: IFlatNode) {
-        this.store.dispatch(AuthActions.invite({ respondentId: node._id }));
+    invite(node: IRespondentNode) {
+        this.inviteEvent.emit(node);
     }
 
-    confirmEdit() {
-
-        if (!this.editNodeControl.value || !this.editNodeControl.dirty) {
-            this.cancelEdit();
-            return;
-        }
-
-        if (this.editNode?.type === ENodeTypes.Respondent) {
-            const respondent = {
-                _id: this.editNode._id,
-                ...parseName(this.editNodeControl.value)
-            }
-            this.store.dispatch(DataActions.patchRespondent({ respondent }))
-        } else if (this.editNode?.type === ENodeTypes.Department) {
-            const department = {
-                _id: this.editNode._id,
-                title: this.editNodeControl.value
-            }
-            this.store.dispatch(DataActions.patchDepartment({ department }));
-        }
-
-        this.editNode = null;
-        this.editNodeControl.reset();
+    isRespondent(index: number, node: IFlatNode) {
+        return node.type === ENodeTypes.Respondent;
     }
 
-
-
-    cancelEdit() {
-        this.editNode = null;
-        this.editNodeControl.reset();
+    isDepartment(index: number, node: IFlatNode) {
+        return node.type === ENodeTypes.Department;
     }
 
-    remove(node: IFlatNode) {
-        if (node.type === ENodeTypes.Respondent) {
-            this.store.dispatch(DataActions.removeRespondent({ _id: node._id }))
-        } else if (node.type === ENodeTypes.Department) {
-            this.store.dispatch(DataActions.removeDepartment({ _id: node._id }))
-        }
+    toggle(node: IFlatNode) {
+        this.treeControl.toggle(node);
     }
+    ENodeTypes = ENodeTypes;
 
-
-    openRespondentEditDialog(respondentId: TObjectId<IRespondent>): void {
-        this.editDialog.open(RespondentContainerComponent, {
-            width: '600px',
-            disableClose: true,
-            data: { respondentId }
-        });
-    }
-
-    openDepartmentEditDialog(departmentId: TObjectId<IDepartment>): void {
-        this.editDialog.open(DepartmentContainerComponent, {
-            width: '600px',
-            disableClose: true,
-            data: { departmentId }
-        });
-    }
-
-
-    getSignUpStatusView = getSignUpStatusView;
 }

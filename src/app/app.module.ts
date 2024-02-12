@@ -36,7 +36,6 @@ import { QuestionCardPersonalComponent } from './cards/question-card-personal/qu
 import { QuestionCardTeamAssertBooleanComponent } from './cards/question-card-team-assert-boolean/question-card-team-assert-boolean.component';
 import { ReportWallComponent } from './reports/report-wall/report-wall.component';
 import { CompanyComponent } from './company/company.component';
-import { CompanyTreeComponent } from './company/company-tree/company-tree.component';
 import { LogoutComponent } from './auth/logout/logout.component';
 
 import { StoreModule } from '@ngrx/store';
@@ -89,6 +88,7 @@ import { ReportPersonalSkillsComponent } from './reports/report-personal/report-
 import { LoginStatusContainerComponent } from './auth/login-status/login-status-container.component';
 import { QuestionCardLayoutComponent } from './cards/question-card-layout/question-card-layout.component';
 import { CompanyEditContainerComponent } from './company/company-edit/company-edit-container.component';
+import { CompanyTreeContainer } from './company/company-tree/company-tree-container.component';
 
 @NgModule({
     declarations: [
@@ -102,7 +102,6 @@ import { CompanyEditContainerComponent } from './company/company-edit/company-ed
         QuestionCardTeamAssertBooleanComponent,
         ReportWallComponent,
         CompanyComponent,
-        CompanyTreeComponent,
         
         FocusableDirective,
         ReportPersonalEfficiencyComponent,
@@ -161,6 +160,7 @@ import { CompanyEditContainerComponent } from './company/company-edit/company-ed
         LogoutComponent,
         QuestionCardLayoutComponent,
         CompanyEditContainerComponent,
+        CompanyTreeContainer,
     ],
     providers: [
         {
