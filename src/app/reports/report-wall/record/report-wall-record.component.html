@@ -1,0 +1,14 @@
+<div class="record" [class.bad-record]="mood === SelfMood.Sad">
+    <div class="text">
+        {{text}}
+    </div>
+    <img *ngIf="mood !== undefined" [src]="images[mood]" class="mood" width="50" height="50">
+</div>
+<div class="subscription">
+    <div class="date">
+        {{getDateView(date)}}
+    </div>
+    <div class="name">
+        {{respondent || 'Аноним'}}
+    </div>
+</div>

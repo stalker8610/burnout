@@ -89,6 +89,7 @@ import { LoginStatusContainerComponent } from './auth/login-status/login-status-
 import { QuestionCardLayoutComponent } from './cards/question-card-layout/question-card-layout.component';
 import { CompanyEditContainerComponent } from './company/company-edit/company-edit-container.component';
 import { CompanyTreeContainer } from './company/company-tree/company-tree-container.component';
+import { ReportWallRecordComponent } from './reports/report-wall/record/report-wall-record.component';
 
 @NgModule({
     declarations: [
@@ -102,7 +103,6 @@ import { CompanyTreeContainer } from './company/company-tree/company-tree-contai
         QuestionCardTeamAssertBooleanComponent,
         ReportWallComponent,
         CompanyComponent,
-        
         FocusableDirective,
         ReportPersonalEfficiencyComponent,
         ReportCompanyComponent,
@@ -161,6 +161,7 @@ import { CompanyTreeContainer } from './company/company-tree/company-tree-contai
         QuestionCardLayoutComponent,
         CompanyEditContainerComponent,
         CompanyTreeContainer,
+        ReportWallRecordComponent
     ],
     providers: [
         {

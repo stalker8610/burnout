@@ -5,24 +5,11 @@
     </div>
     <ng-template #loadedBlock>
         <ng-container *ngIf="(records | async)?.length; else noDataProvided">
-            <div *ngFor="let item of records | async">
-                <div class="record-container">
-                    <div class="record" [class.bad-record]="item.mood === SelfMood.Sad">
-                        <div class="text">
-                            {{item.text}}
-                        </div>
-                        <img *ngIf="item.mood !== undefined" [src]="images[item.mood]" class="mood" width="50" height="50">
-                    </div>
-                    <div class="subscription">
-                        <div class="date">
-                            {{getDateView(item.date)}}
-                        </div>
-                        <div class="name">
-                            {{item.respondent}}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ng-container *ngFor="let item of records | async">
+                <app-report-wall-record [mood]="item.mood" [text]="item.text || ''" [date]="item.date"
+                    [respondent]="item.respondent">
+                </app-report-wall-record>
+            </ng-container>
         </ng-container>
         <ng-template #noDataProvided>
             Недостаточно данных для отображения
