@@ -1,4 +1,4 @@
-<div class="caption">Оценка компании сотрудниками</div>
+<header>Оценка компании сотрудниками</header>
 <div class="chart-container">
     <ng-container *ngIf="data | async; else noDataProvided">
         <canvas baseChart class="chart" [data]="chartData" [options]="chartOptions" [type]="'polarArea'">

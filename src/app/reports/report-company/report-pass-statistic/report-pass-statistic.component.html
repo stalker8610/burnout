@@ -1,4 +1,4 @@
-<div class="caption">Отчет о прохождении опросов</div>
+<header>Отчет о прохождении опросов</header>
 <div class="chart-container">
     <ng-container *ngIf="data | async; else noDataProvided">
         <canvas baseChart class="chart" [data]="lineChartData" [options]="lineChartOptions" [type]="'line'">
